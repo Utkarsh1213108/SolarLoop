@@ -1,0 +1,6 @@
+{
+  "name": "SolarLoop — Solar Circularity Intelligence Platform",
+  "description": "Enterprise B2B decision platform for solar asset end-of-life forecasting, reverse logistics, network planning, material recovery, circular economics, and EPR compliance.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
