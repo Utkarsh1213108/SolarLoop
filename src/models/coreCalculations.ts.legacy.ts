@@ -21,9 +21,9 @@ import {
 import { 
   BASELINE_SCENARIOS, 
   REPRESENTATIVE_MODULE_COMPOSITION, 
-  RECYCLING_PATHWAYS,
-  STATE_SOLAR_PROFILES
-} from '../data/researchBaseline';
+  RECYCLING_PATHWAYS
+} from '../data/legacyResearchBaseline';
+import { STATE_SOLAR_PROFILES } from '../data/researchBaseline';
 
 /**
  * SOLARLOOP MODEL v2.5 — DETERMINISTIC MATHEMATICAL & CIRCULARITY CAUSAL ENGINE

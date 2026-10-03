@@ -9,7 +9,6 @@ import {
   CanonicalScenarioOutput
 } from '../types';
 import { 
-  DEFAULT_SCENARIO_PARAMETERS, 
   SAMPLE_SOLAR_ASSETS, 
   DEMO_LOGISTICS_BATCHES 
 } from '../data/researchBaseline';
