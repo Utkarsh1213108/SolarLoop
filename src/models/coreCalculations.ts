@@ -19,7 +19,6 @@ import {
   ForecastScenarioId, 
   AnnualWasteStreamBreakdown,
   PlantCapacityTier,
-  ActiveFleetReconciliation,
   YearlyFleetBalance,
   FinancialAnalysis,
   TornadoItem,
@@ -471,20 +470,6 @@ export function run_scenario(
     }
   };
 
-  // Active fleet reconciliation from canonical Weibull engine
-  const reconciliation: ActiveFleetReconciliation = {
-    targetYear: 2050,
-    totalInstalledToDateGW: sc.capacity_path === 'Conservative' ? 794.6 : sc.capacity_path === 'Base' ? 1484.6 : 1934.6,
-    activeOperatingFleetGW: sc.capacity_path === 'Conservative' ? 678.2 : sc.capacity_path === 'Base' ? 1329.8 : 1761.5,
-    cumulativeRetiredScheduledGW: (m50.cumulative_waste_kt / 58.0),
-    cumulativeEarlyLossGW: 0,
-    cumulativeRepoweredGW: 0,
-    cumulativeDamagedGW: 0,
-    reconciliationIdentityFormula: 'Installed Mass = Surviving Operating Fleet + Cumulative EoL Retirements + Commissioning Scrap',
-    isBalanced: true,
-    discrepancyGW: 0,
-    yearlyHistory: []
-  };
 
   const recommendation: SolarLoopRecommendation = {
     scenarioName: CANONICAL_SCENARIOS_META[activeScenarioId]?.name || activeScenarioId,
@@ -583,7 +568,7 @@ export function run_scenario(
       resultLabel: plantSizing.resultLabel
     },
     calibration,
-    reconciliation,
+
     logisticsComparison: logisticsComp,
     technologyEvaluation: techEval,
     sensitivityTornado: tornado,

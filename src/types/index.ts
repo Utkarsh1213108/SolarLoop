@@ -203,20 +203,6 @@ export interface YearlyFleetBalance {
   isBalanced: boolean;
 }
 
-export interface ActiveFleetReconciliation {
-  targetYear: number;
-  totalInstalledToDateGW: number;
-  activeOperatingFleetGW: number;
-  cumulativeRetiredScheduledGW: number;
-  cumulativeEarlyLossGW: number;
-  cumulativeRepoweredGW: number;
-  cumulativeDamagedGW: number;
-  reconciliationIdentityFormula: string;
-  isBalanced: boolean;
-  discrepancyGW: number;
-  yearlyHistory: YearlyFleetBalance[];
-}
-
 export interface TornadoItem {
   driver: string;
   parameterKey: string;
