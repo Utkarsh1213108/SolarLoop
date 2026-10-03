@@ -49,6 +49,10 @@ export const MODEL_METADATA = {
 
 const CANONICAL_LOGISTICS_PARAMETERS = CANONICAL_DATA.logistics_network.haul_distance_parameters;
 
+// CEEW standard plant benchmark represented by canonical/solarloop_engine.py.
+// The runtime canonical JSON does not expose this field, so keep one active adapter constant.
+export const STANDARD_PLANT_CAPACITY_TPA = 3600;
+
 export const PLANT_CAPACITY_TIERS: Record<PlantCapacityTier, {
   name: string;
   capacityTonnesYr: number;
@@ -63,7 +67,7 @@ export const PLANT_CAPACITY_TIERS: Record<PlantCapacityTier, {
   },
   small: {
     name: 'Standard CEEW Benchmark Facility',
-    capacityTonnesYr: 3600,
+    capacityTonnesYr: STANDARD_PLANT_CAPACITY_TPA,
     capexCr: 14.4,
     description: 'Standard 3,600 tpa plant per CEEW (2025) Exhibit 25'
   },
@@ -92,7 +96,7 @@ export const SCENARIO_CONFIGS: Record<ForecastScenarioId, ScenarioParameters> = 
     designLifeYears: 30.0,
     weibullBeta: 30.0,
     avgTransportDistanceKm: CANONICAL_LOGISTICS_PARAMETERS.baseline_average_haul_km,
-    plantCapacityTonnesYr: 3600,
+    plantCapacityTonnesYr: STANDARD_PLANT_CAPACITY_TPA,
     eprFeePerTonneINR: 0,
     reverseLogisticsFreightINR_per_tkm: CANONICAL_LOGISTICS_PARAMETERS.freight_rate_inr_per_tonne_km,
     feedstockCostPerTonneINR: Number.NaN,
@@ -111,7 +115,7 @@ export const SCENARIO_CONFIGS: Record<ForecastScenarioId, ScenarioParameters> = 
     designLifeYears: 30.0,
     weibullBeta: 30.0,
     avgTransportDistanceKm: CANONICAL_LOGISTICS_PARAMETERS.baseline_average_haul_km,
-    plantCapacityTonnesYr: 3600,
+    plantCapacityTonnesYr: STANDARD_PLANT_CAPACITY_TPA,
     eprFeePerTonneINR: 0,
     reverseLogisticsFreightINR_per_tkm: CANONICAL_LOGISTICS_PARAMETERS.freight_rate_inr_per_tonne_km,
     feedstockCostPerTonneINR: Number.NaN,
@@ -130,7 +134,7 @@ export const SCENARIO_CONFIGS: Record<ForecastScenarioId, ScenarioParameters> = 
     designLifeYears: 30.0,
     weibullBeta: 30.0,
     avgTransportDistanceKm: CANONICAL_LOGISTICS_PARAMETERS.baseline_average_haul_km,
-    plantCapacityTonnesYr: 3600,
+    plantCapacityTonnesYr: STANDARD_PLANT_CAPACITY_TPA,
     eprFeePerTonneINR: 0,
     reverseLogisticsFreightINR_per_tkm: CANONICAL_LOGISTICS_PARAMETERS.freight_rate_inr_per_tonne_km,
     feedstockCostPerTonneINR: Number.NaN,
@@ -149,7 +153,7 @@ export const SCENARIO_CONFIGS: Record<ForecastScenarioId, ScenarioParameters> = 
     designLifeYears: 30.0,
     weibullBeta: 30.0,
     avgTransportDistanceKm: CANONICAL_LOGISTICS_PARAMETERS.baseline_average_haul_km,
-    plantCapacityTonnesYr: 3600,
+    plantCapacityTonnesYr: STANDARD_PLANT_CAPACITY_TPA,
     eprFeePerTonneINR: 0,
     reverseLogisticsFreightINR_per_tkm: CANONICAL_LOGISTICS_PARAMETERS.freight_rate_inr_per_tonne_km,
     feedstockCostPerTonneINR: Number.NaN,
@@ -168,7 +172,7 @@ export const SCENARIO_CONFIGS: Record<ForecastScenarioId, ScenarioParameters> = 
     designLifeYears: 30.0,
     weibullBeta: 30.0,
     avgTransportDistanceKm: CANONICAL_LOGISTICS_PARAMETERS.baseline_average_haul_km,
-    plantCapacityTonnesYr: 3600,
+    plantCapacityTonnesYr: STANDARD_PLANT_CAPACITY_TPA,
     eprFeePerTonneINR: 0,
     reverseLogisticsFreightINR_per_tkm: CANONICAL_LOGISTICS_PARAMETERS.freight_rate_inr_per_tonne_km,
     feedstockCostPerTonneINR: Number.NaN,
@@ -187,7 +191,7 @@ export const SCENARIO_CONFIGS: Record<ForecastScenarioId, ScenarioParameters> = 
     designLifeYears: 30.0,
     weibullBeta: 30.0,
     avgTransportDistanceKm: CANONICAL_LOGISTICS_PARAMETERS.baseline_average_haul_km,
-    plantCapacityTonnesYr: 3600,
+    plantCapacityTonnesYr: STANDARD_PLANT_CAPACITY_TPA,
     eprFeePerTonneINR: 0,
     reverseLogisticsFreightINR_per_tkm: CANONICAL_LOGISTICS_PARAMETERS.freight_rate_inr_per_tonne_km,
     feedstockCostPerTonneINR: Number.NaN,
@@ -208,7 +212,7 @@ export const DEFAULT_SCENARIO_PARAMETERS: ScenarioParameters = SCENARIO_CONFIGS.
  */
 export function calculate_required_plants(
   annualFlowKt: number,
-  plantCapacityTonnesYr: number = 3600
+  plantCapacityTonnesYr: number = STANDARD_PLANT_CAPACITY_TPA
 ): {
   plantCapacityTonnesYr: number;
   plantCapacityKtYr: number;

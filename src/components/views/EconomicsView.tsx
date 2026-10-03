@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useScenario } from '../../context/ScenarioContext';
 import { DataProvenanceBadge } from '../common/DataProvenanceBadge';
 import { CANONICAL_SCENARIO_MAP } from '../../data/canonicalLoader';
+import { calculate_required_plants, STANDARD_PLANT_CAPACITY_TPA } from '../../models/coreCalculations';
 import { 
   Coins, 
   TrendingUp, 
@@ -25,9 +26,10 @@ export const EconomicsView: React.FC = () => {
   const econRef = canonicalData.economics_reference;
   const currentCase = econRef[selectedCase];
   const activeScenarioData = canonicalData.forecast_outputs[CANONICAL_SCENARIO_MAP[activeScenario]];
-  const peakPlantCount = Math.ceil(
-    activeScenarioData.milestone_years['2040'].annual_waste_kt * 1000 / 3600
-  );
+  const peakPlantCount = calculate_required_plants(
+    activeScenarioData.milestone_years['2040'].annual_waste_kt,
+    STANDARD_PLANT_CAPACITY_TPA
+  ).totalPlants;
 
   return (
     <div className="p-6 space-y-6 max-w-7xl mx-auto">

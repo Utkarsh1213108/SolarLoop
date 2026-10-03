@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useScenario } from '../../context/ScenarioContext';
 import { DataProvenanceBadge } from '../common/DataProvenanceBadge';
 import { CANONICAL_SCENARIOS_META } from '../../data/canonicalLoader';
+import { calculate_required_plants, STANDARD_PLANT_CAPACITY_TPA } from '../../models/coreCalculations';
 import { 
   TrendingUp, 
   ArrowRight, 
@@ -54,10 +55,10 @@ export const OverviewView: React.FC<OverviewViewProps> = ({ onNavigate }) => {
   const baseM2040 = baseRegularData.milestone_years['2040'];
   const baseM2050 = baseRegularData.milestone_years['2050'];
 
-  // Standard 3,600 tpa modular plant calculation
-  const plants2030 = Math.ceil((m2030.annual_waste_kt * 1000) / 3600);
-  const plants2040 = Math.ceil((m2040.annual_waste_kt * 1000) / 3600);
-  const plants2050 = Math.ceil((m2050.annual_waste_kt * 1000) / 3600);
+  // Standard plant counts use the shared canonical benchmark adapter.
+  const plants2030 = calculate_required_plants(m2030.annual_waste_kt, STANDARD_PLANT_CAPACITY_TPA).totalPlants;
+  const plants2040 = calculate_required_plants(m2040.annual_waste_kt, STANDARD_PLANT_CAPACITY_TPA).totalPlants;
+  const plants2050 = calculate_required_plants(m2050.annual_waste_kt, STANDARD_PLANT_CAPACITY_TPA).totalPlants;
 
   // Economic reference cases
   const econCases = canonicalData.economics_reference;
