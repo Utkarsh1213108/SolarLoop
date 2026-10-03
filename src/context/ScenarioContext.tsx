@@ -16,7 +16,6 @@ import {
 import { 
   CANONICAL_SCENARIO_MAP,
   CANONICAL_SCENARIOS_META,
-  getCanonicalScenario,
   getCanonicalTimeSeries,
   calculateCanonicalMaterialFlow,
   calculateCanonicalEconomics,
@@ -120,12 +119,12 @@ export const ScenarioProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     return Object.values(CANONICAL_SCENARIOS_META);
   }, []);
 
-  const activeCanonicalScenario = useMemo(() => {
+  const activeCanonicalScenario = useMemo<CanonicalScenarioOutput | null>(() => {
     if (!canonicalData) {
-      return getCanonicalScenario(activeScenario);
+      return null;
     }
     const key = CANONICAL_SCENARIO_MAP[activeScenario] || 'Base·Regular';
-    return canonicalData.forecast_outputs[key] || getCanonicalScenario(activeScenario);
+    return canonicalData.forecast_outputs[key] || null;
   }, [canonicalData, activeScenario]);
 
   // Compute live analytical results mapped directly from canonical engine
@@ -133,12 +132,18 @@ export const ScenarioProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     return run_scenario(scenarioParams, activeScenario);
   }, [scenarioParams, activeScenario]);
 
-  const canonicalMaterialFlow = useMemo(() => {
+  const canonicalMaterialFlow = useMemo<ReturnType<typeof calculateCanonicalMaterialFlow> | null>(() => {
+    if (!activeCanonicalScenario) {
+      return null;
+    }
     const annual2040 = activeCanonicalScenario.milestone_years['2040'].annual_waste_kt * 1000;
     return calculateCanonicalMaterialFlow(annual2040, 'Chemical');
   }, [activeCanonicalScenario]);
 
-  const canonicalEconomics = useMemo(() => {
+  const canonicalEconomics = useMemo<ReturnType<typeof calculateCanonicalEconomics> | null>(() => {
+    if (!canonicalData) {
+      return null;
+    }
     return calculateCanonicalEconomics({
       silverPriceINR_per_g: scenarioParams.silverPriceINR_per_kg ? scenarioParams.silverPriceINR_per_kg / 1000 : 240.0,
       haulDistanceKm: scenarioParams.avgTransportDistanceKm,
@@ -193,7 +198,7 @@ export const ScenarioProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     activeScenario,
     setActiveScenario,
     availableScenarios,
-    activeCanonicalScenario,
+    activeCanonicalScenario: activeCanonicalScenario!,
     userRole,
     setUserRole,
     selectedState,
@@ -208,8 +213,8 @@ export const ScenarioProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     updateScenarioParam,
     resetScenarioParams,
     simulationResult,
-    canonicalMaterialFlow,
-    canonicalEconomics,
+    canonicalMaterialFlow: canonicalMaterialFlow!,
+    canonicalEconomics: canonicalEconomics!,
     runSimulation,
     assets,
     addAsset,
