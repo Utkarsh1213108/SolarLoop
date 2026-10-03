@@ -47,6 +47,8 @@ export const MODEL_METADATA = {
   sourceHierarchy: CANONICAL_DATA.model_metadata.source_hierarchy
 };
 
+const CANONICAL_LOGISTICS_PARAMETERS = CANONICAL_DATA.logistics_network.haul_distance_parameters;
+
 export const PLANT_CAPACITY_TIERS: Record<PlantCapacityTier, {
   name: string;
   capacityTonnesYr: number;
@@ -89,10 +91,10 @@ export const SCENARIO_CONFIGS: Record<ForecastScenarioId, ScenarioParameters> = 
     moduleMassKg: 22.0,
     designLifeYears: 30.0,
     weibullBeta: 30.0,
-    avgTransportDistanceKm: 360,
+    avgTransportDistanceKm: CANONICAL_LOGISTICS_PARAMETERS.baseline_average_haul_km,
     plantCapacityTonnesYr: 3600,
     eprFeePerTonneINR: 0,
-    reverseLogisticsFreightINR_per_tkm: 12.0,
+    reverseLogisticsFreightINR_per_tkm: CANONICAL_LOGISTICS_PARAMETERS.freight_rate_inr_per_tonne_km,
     feedstockCostPerTonneINR: Number.NaN,
     recoveryEfficiencyPct: 89.0,
     silverPriceINR_per_kg: 240000,
@@ -108,10 +110,10 @@ export const SCENARIO_CONFIGS: Record<ForecastScenarioId, ScenarioParameters> = 
     moduleMassKg: 22.0,
     designLifeYears: 30.0,
     weibullBeta: 30.0,
-    avgTransportDistanceKm: 360,
+    avgTransportDistanceKm: CANONICAL_LOGISTICS_PARAMETERS.baseline_average_haul_km,
     plantCapacityTonnesYr: 3600,
     eprFeePerTonneINR: 0,
-    reverseLogisticsFreightINR_per_tkm: 12.0,
+    reverseLogisticsFreightINR_per_tkm: CANONICAL_LOGISTICS_PARAMETERS.freight_rate_inr_per_tonne_km,
     feedstockCostPerTonneINR: Number.NaN,
     recoveryEfficiencyPct: 89.0,
     silverPriceINR_per_kg: 240000,
@@ -127,10 +129,10 @@ export const SCENARIO_CONFIGS: Record<ForecastScenarioId, ScenarioParameters> = 
     moduleMassKg: 22.0,
     designLifeYears: 30.0,
     weibullBeta: 30.0,
-    avgTransportDistanceKm: 360,
+    avgTransportDistanceKm: CANONICAL_LOGISTICS_PARAMETERS.baseline_average_haul_km,
     plantCapacityTonnesYr: 3600,
     eprFeePerTonneINR: 0,
-    reverseLogisticsFreightINR_per_tkm: 12.0,
+    reverseLogisticsFreightINR_per_tkm: CANONICAL_LOGISTICS_PARAMETERS.freight_rate_inr_per_tonne_km,
     feedstockCostPerTonneINR: Number.NaN,
     recoveryEfficiencyPct: 89.0,
     silverPriceINR_per_kg: 240000,
@@ -146,10 +148,10 @@ export const SCENARIO_CONFIGS: Record<ForecastScenarioId, ScenarioParameters> = 
     moduleMassKg: 22.0,
     designLifeYears: 30.0,
     weibullBeta: 30.0,
-    avgTransportDistanceKm: 360,
+    avgTransportDistanceKm: CANONICAL_LOGISTICS_PARAMETERS.baseline_average_haul_km,
     plantCapacityTonnesYr: 3600,
     eprFeePerTonneINR: 0,
-    reverseLogisticsFreightINR_per_tkm: 12.0,
+    reverseLogisticsFreightINR_per_tkm: CANONICAL_LOGISTICS_PARAMETERS.freight_rate_inr_per_tonne_km,
     feedstockCostPerTonneINR: Number.NaN,
     recoveryEfficiencyPct: 89.0,
     silverPriceINR_per_kg: 240000,
@@ -165,10 +167,10 @@ export const SCENARIO_CONFIGS: Record<ForecastScenarioId, ScenarioParameters> = 
     moduleMassKg: 22.0,
     designLifeYears: 30.0,
     weibullBeta: 30.0,
-    avgTransportDistanceKm: 360,
+    avgTransportDistanceKm: CANONICAL_LOGISTICS_PARAMETERS.baseline_average_haul_km,
     plantCapacityTonnesYr: 3600,
     eprFeePerTonneINR: 0,
-    reverseLogisticsFreightINR_per_tkm: 12.0,
+    reverseLogisticsFreightINR_per_tkm: CANONICAL_LOGISTICS_PARAMETERS.freight_rate_inr_per_tonne_km,
     feedstockCostPerTonneINR: Number.NaN,
     recoveryEfficiencyPct: 89.0,
     silverPriceINR_per_kg: 240000,
@@ -184,10 +186,10 @@ export const SCENARIO_CONFIGS: Record<ForecastScenarioId, ScenarioParameters> = 
     moduleMassKg: 22.0,
     designLifeYears: 30.0,
     weibullBeta: 30.0,
-    avgTransportDistanceKm: 360,
+    avgTransportDistanceKm: CANONICAL_LOGISTICS_PARAMETERS.baseline_average_haul_km,
     plantCapacityTonnesYr: 3600,
     eprFeePerTonneINR: 0,
-    reverseLogisticsFreightINR_per_tkm: 12.0,
+    reverseLogisticsFreightINR_per_tkm: CANONICAL_LOGISTICS_PARAMETERS.freight_rate_inr_per_tonne_km,
     feedstockCostPerTonneINR: Number.NaN,
     recoveryEfficiencyPct: 89.0,
     silverPriceINR_per_kg: 240000,
@@ -237,7 +239,10 @@ export function calculate_required_plants(
 /**
  * Logistics comparison based on canonical Hub-and-Spoke network
  */
-export function calculate_transport_cost(distanceKm: number, freightRateINR_per_tkm: number = 12.0) {
+export function calculate_transport_cost(
+  distanceKm: number,
+  freightRateINR_per_tkm: number = CANONICAL_LOGISTICS_PARAMETERS.freight_rate_inr_per_tonne_km
+) {
   const freightCost = distanceKm * freightRateINR_per_tkm;
   return {
     distanceKm,
@@ -247,9 +252,9 @@ export function calculate_transport_cost(distanceKm: number, freightRateINR_per_
 }
 
 export function calculate_logistics_comparison(annualFlowKt: number, params?: Partial<ScenarioParameters>) {
-  const baselineHaulKm = 360.0;
-  const optimizedHaulKm = 100.0;
-  const freightRate = params?.reverseLogisticsFreightINR_per_tkm ?? 12.0;
+  const baselineHaulKm = CANONICAL_LOGISTICS_PARAMETERS.baseline_average_haul_km;
+  const optimizedHaulKm = CANONICAL_LOGISTICS_PARAMETERS.optimized_spoke_haul_km;
+  const freightRate = params?.reverseLogisticsFreightINR_per_tkm ?? CANONICAL_LOGISTICS_PARAMETERS.freight_rate_inr_per_tonne_km;
 
   const baselineCostPerTonne = baselineHaulKm * freightRate;
   const optimizedCostPerTonne = optimizedHaulKm * freightRate;
