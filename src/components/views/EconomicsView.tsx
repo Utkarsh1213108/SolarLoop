@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useScenario } from '../../context/ScenarioContext';
-import { WaterfallChart } from '../common/WaterfallChart';
 import { DataProvenanceBadge } from '../common/DataProvenanceBadge';
+import { CANONICAL_SCENARIO_MAP } from '../../data/canonicalLoader';
 import { 
   Coins, 
   TrendingUp, 
@@ -17,57 +17,17 @@ import {
 } from 'lucide-react';
 
 export const EconomicsView: React.FC = () => {
-  const { 
-    canonicalData,
-    scenarioParams, 
-    updateScenarioParam, 
-    resetScenarioParams,
-    canonicalEconomics,
-    askIntelligence
-  } = useScenario();
+  const { canonicalData, activeScenario, askIntelligence } = useScenario();
 
   const [selectedCase, setSelectedCase] = useState<'Silver_Repriced_Team_Case' | 'Published_CEEW_Chemical' | 'EPR_Floor_Bankable_Case' | 'Published_CEEW_Mechanical'>('Silver_Repriced_Team_Case');
   const [showDetailedEconomics, setShowDetailedEconomics] = useState(false);
 
   const econRef = canonicalData.economics_reference;
   const currentCase = econRef[selectedCase];
-
-  // Canonical waterfall data mapped to EconomicModelOutputs interface
-  const waterfallEconomics = {
-    grossRecoveredValuePerTonneINR: 36759,
-    logisticsCostPerTonneINR: scenarioParams.avgTransportDistanceKm * 12.0,
-    processingCostPerTonneINR: selectedCase === 'Published_CEEW_Mechanical' ? 40100 : 49100,
-    feedstockCostPerTonneINR: 27300,
-    eprContributionPerTonneINR: selectedCase === 'EPR_Floor_Bankable_Case' ? 22000 : scenarioParams.eprFeePerTonneINR,
-    netMarginPerTonneINR: currentCase.net_inr_per_tonne,
-    breakEvenFeedstockPricePerTonneINR: 14959,
-    annualPlantEBITDA_INR_Cr: selectedCase === 'EPR_Floor_Bankable_Case' ? 3.87 : -2.14,
-    projectIRRPct: selectedCase === 'EPR_Floor_Bankable_Case' ? 18.4 : null,
-    projectNPV_Cr: selectedCase === 'EPR_Floor_Bankable_Case' ? 8.4 : -15.8,
-    paybackPeriodYears: selectedCase === 'EPR_Floor_Bankable_Case' ? 4.8 : null,
-    ebitdaMarginPct: selectedCase === 'EPR_Floor_Bankable_Case' ? 26.5 : -12.1,
-    financialAnalysis: {
-      isEconomicallyAttractive: selectedCase === 'EPR_Floor_Bankable_Case',
-      viabilityVerdict: selectedCase === 'EPR_Floor_Bankable_Case' ? ('COMMERCIALLY VIABLE' as const) : ('NOT ECONOMICALLY VIABLE' as const),
-      attractivenessReasoning: currentCase.notes,
-      projectNPV_Cr: selectedCase === 'EPR_Floor_Bankable_Case' ? 8.4 : -15.8,
-      projectIRRPct: selectedCase === 'EPR_Floor_Bankable_Case' ? 18.4 : null,
-      paybackPeriodYears: selectedCase === 'EPR_Floor_Bankable_Case' ? 4.8 : null,
-      discountedPaybackPeriodYears: selectedCase === 'EPR_Floor_Bankable_Case' ? 5.6 : null,
-      terminalValueCr: 0,
-      breakEvenFeedstockINR_per_tonne: 14959,
-      breakEvenEprINR_per_tonne: 5938,
-      ebitdaAnnualCr: selectedCase === 'EPR_Floor_Bankable_Case' ? 3.87 : -2.14,
-      ebitdaMarginPct: selectedCase === 'EPR_Floor_Bankable_Case' ? 26.5 : -12.1,
-      totalCapitalInvestmentCr: 14.4,
-      plantCapexCr: 14.4,
-      projectLifeYears: 10,
-      discountRatePct: 10.0,
-      capacityUtilizationPct: 67.0,
-      annualThroughputTonnes: 2412,
-      dcfSchedule: []
-    }
-  };
+  const activeScenarioData = canonicalData.forecast_outputs[CANONICAL_SCENARIO_MAP[activeScenario]];
+  const peakPlantCount = Math.ceil(
+    activeScenarioData.milestone_years['2040'].annual_waste_kt * 1000 / 3600
+  );
 
   return (
     <div className="p-6 space-y-6 max-w-7xl mx-auto">
@@ -139,7 +99,7 @@ export const EconomicsView: React.FC = () => {
         <div className="bg-white border border-slate-200 rounded-xl p-4 shadow-xs">
           <div className="text-slate-500 text-xs font-medium">Contained Gross Value</div>
           <div className="mt-2 text-2xl font-bold text-emerald-800 font-mono tabular-nums">
-            ₹36,759
+            Not specified
             <span className="text-xs font-sans font-normal text-slate-500"> / t</span>
           </div>
           <div className="text-[11px] text-slate-500 font-mono mt-1">
@@ -151,7 +111,7 @@ export const EconomicsView: React.FC = () => {
         <div className="bg-white border border-slate-200 rounded-xl p-4 shadow-xs">
           <div className="text-slate-500 text-xs font-medium">Processing Cost (OPEX)</div>
           <div className="mt-2 text-2xl font-bold text-slate-900 font-mono tabular-nums">
-            ₹{selectedCase === 'Published_CEEW_Mechanical' ? '40,100' : '49,100'}
+            ₹{canonicalData.recycling_routes[selectedCase === 'Published_CEEW_Mechanical' ? 'Mechanical' : 'Chemical'].report_cost_inr_per_tonne.toLocaleString()}
             <span className="text-xs font-sans font-normal text-slate-500"> / t</span>
           </div>
           <div className="text-[11px] text-slate-500 font-mono mt-1">
@@ -163,7 +123,7 @@ export const EconomicsView: React.FC = () => {
         <div className="bg-white border border-slate-200 rounded-xl p-4 shadow-xs">
           <div className="text-slate-500 text-xs font-medium">Feedstock Cost</div>
           <div className="mt-2 text-2xl font-bold text-slate-900 font-mono tabular-nums">
-            ₹27,300
+            Not specified
             <span className="text-xs font-sans font-normal text-slate-500"> / t</span>
           </div>
           <div className="text-[11px] text-slate-500 font-mono mt-1">
@@ -219,8 +179,9 @@ export const EconomicsView: React.FC = () => {
         </button>
       </div>
 
-      {/* Waterfall Visualizer */}
-      <WaterfallChart economics={waterfallEconomics} title={`Per-Tonne Recycling Financial Waterfall (${currentCase.label})`} />
+      <div className="bg-white border border-slate-200 rounded-lg p-5 text-xs text-slate-600">
+        Canonical economics provides reference-case net margins and notes only. Gross value, feedstock, logistics breakdown, and DCF fields are not specified in the canonical economics reference.
+      </div>
 
       {/* Capex Benchmark Panel from CEEW Exhibit 25 */}
       <div className="bg-white border border-slate-200 rounded-xl p-5 shadow-xs space-y-4">
@@ -237,24 +198,24 @@ export const EconomicsView: React.FC = () => {
         <div className="grid grid-cols-1 sm:grid-cols-4 gap-3 text-xs">
           <div className="p-3 bg-slate-50 rounded-lg border border-slate-200">
             <span className="text-slate-500 text-[10px] block">Land Acquisition (1.5 acres)</span>
-            <span className="text-sm font-bold font-mono text-slate-900">₹4.75 Cr</span>
+            <span className="text-sm font-bold font-mono text-slate-500">Not specified</span>
           </div>
           <div className="p-3 bg-slate-50 rounded-lg border border-slate-200">
             <span className="text-slate-500 text-[10px] block">Factory Construction</span>
-            <span className="text-sm font-bold font-mono text-slate-900">₹2.30 Cr</span>
+            <span className="text-sm font-bold font-mono text-slate-500">Not specified</span>
           </div>
           <div className="p-3 bg-slate-50 rounded-lg border border-slate-200">
             <span className="text-slate-500 text-[10px] block">Thermal/Hydromet Machinery</span>
-            <span className="text-sm font-bold font-mono text-slate-900">₹7.13 Cr</span>
+            <span className="text-sm font-bold font-mono text-slate-500">Not specified</span>
           </div>
           <div className="p-3 bg-slate-50 rounded-lg border border-slate-200">
             <span className="text-slate-500 text-[10px] block">TSDF / Environmental Compliance</span>
-            <span className="text-sm font-bold font-mono text-slate-900">₹0.20 Cr</span>
+            <span className="text-sm font-bold font-mono text-slate-500">Not specified</span>
           </div>
         </div>
 
         <div className="p-3 bg-teal-50/60 border border-teal-200 rounded-lg text-xs text-slate-700 leading-relaxed">
-          <strong>National Capital Scaling:</strong> Sizing standard 3,600 tpa plants nationally implies an aggregate capital requirement of <strong>₹4,274 Cr</strong> across 299 plants at peak 2040–2050 volumes. Indigenisation of delamination autoclaves and leaching tanks offers a potential ~43% capex reduction on the machinery component.
+          <strong>National Facility Scaling:</strong> Canonical 2040 annual flow implies approximately <strong>{peakPlantCount} standard 3,600 tpa plants</strong>. Capital requirement and capex reduction are not specified in the canonical economics reference.
         </div>
       </div>
     </div>

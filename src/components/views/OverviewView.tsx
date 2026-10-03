@@ -127,7 +127,7 @@ export const OverviewView: React.FC<OverviewViewProps> = ({ onNavigate }) => {
                 {(m2050.cumulative_waste_kt / unitDivider).toLocaleString(undefined, { maximumFractionDigits: 1 })} {unitLabel} by 2050
               </strong>
               . Commercial viability hinges on statutory EPR support to bridge the current{' '}
-              <strong className="text-rose-300">−₹5,938/tonne</strong> processing deficit.
+              <strong className="text-rose-300">{econCases.Silver_Repriced_Team_Case.net_inr_per_tonne.toLocaleString()} / tonne</strong> processing margin.
             </p>
           </div>
 
@@ -177,11 +177,11 @@ export const OverviewView: React.FC<OverviewViewProps> = ({ onNavigate }) => {
                 Circularity Unit Margin
               </div>
               <div className="text-2xl font-bold font-mono text-rose-300 mt-1">
-                −₹5,938
+                {econCases.Silver_Repriced_Team_Case.net_inr_per_tonne.toLocaleString()}
                 <span className="text-xs text-slate-400 font-sans ml-1">/t</span>
               </div>
               <div className="text-xs text-emerald-400 mt-1">
-                Flips to +₹16,062/t with EPR floor
+                EPR floor case: {econCases.EPR_Floor_Bankable_Case.net_inr_per_tonne.toLocaleString()}/t
               </div>
             </div>
           </div>

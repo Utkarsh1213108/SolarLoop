@@ -211,7 +211,9 @@ export function calculateCanonicalMaterialFlow(
 }
 
 /**
- * Parametric unit economics strictly mapped from solarloop_engine.py calculate_economics()
+ * Selects a canonical economics reference case. The canonical dataset is the
+ * only source for the returned economics value; unsupported breakdown fields
+ * are intentionally not reconstructed here.
  */
 export function calculateCanonicalEconomics(options: {
   silverPriceINR_per_g?: number;
@@ -224,64 +226,19 @@ export function calculateCanonicalEconomics(options: {
   route?: 'Chemical' | 'Mechanical';
 }) {
   const data = getCanonicalData();
-  const silverPrice = options.silverPriceINR_per_g ?? 240.0;
-  const silverRecovery = options.silverRecoveryRate ?? 0.74;
-  const feedstockPerModule = options.feedstockCostINR_per_module ?? 600.0;
-  const modulesPerTonne = options.modulesPerTonne ?? 45.45;
-  const haulKm = options.haulDistanceKm ?? 360.0;
-  const freightRate = options.freightRateINR_per_tkm ?? 12.0;
-  const eprCreditPerKg = options.eprCertificateINR_per_kg ?? 0.0;
-
-  // 1. CEEW 2025 published baseline
-  const ceewPublishedNetINR = -12341.0;
-  const ceewBaselineSilverPrice = 95.8;
-  const ceewSilverYieldG = 60.0 * 0.74; // 44.4 g recovered
-
-  // 2. Feedstock Procurement Cost (recurring)
-  const feedstockCostPerTonne = feedstockPerModule * modulesPerTonne;
-  const baselineFeedstockINR = 600.0 * 45.45;
-  const feedstockDeltaINR = feedstockCostPerTonne - baselineFeedstockINR;
-
-  // 3. Logistics Cost Adjustment
-  const baselineHaulKm = 360.0;
-  const logisticsDeltaINR = (haulKm - baselineHaulKm) * freightRate;
-
-  // 4. Silver Revenue Adjustment
-  const containedAgG = 60.0;
-  const recoveredAgG = containedAgG * silverRecovery;
-  const silverRevActualINR = recoveredAgG * silverPrice;
-  const ceewRefSilverRevINR = ceewSilverYieldG * ceewBaselineSilverPrice;
-  const silverDeltaINR = silverRevActualINR - ceewRefSilverRevINR;
-
-  // 5. EPR Certificate Credit
-  const eprCreditPerTonne = eprCreditPerKg * 1000.0;
-
-  // 6. Net economics
-  const netEconomicsINRPerTonne = (
-    ceewPublishedNetINR
-    + silverDeltaINR
-    - feedstockDeltaINR
-    - logisticsDeltaINR
-    + eprCreditPerTonne
-  );
+  const references = data.economics_reference;
+  const priceMatch = options.silverPriceINR_per_g === undefined
+    ? undefined
+    : Object.values(references).find(reference => reference.notes.includes(`₹${options.silverPriceINR_per_g}/g`));
+  const selectedCase = options.route === 'Mechanical'
+    ? references.Published_CEEW_Mechanical
+    : options.eprCertificateINR_per_kg && options.eprCertificateINR_per_kg > 0
+      ? references.EPR_Floor_Bankable_Case
+      : priceMatch || references.Silver_Repriced_Team_Case;
 
   return {
-    netEconomicsINRPerTonne: Math.round(netEconomicsINRPerTonne),
-    breakdown: {
-      ceewPublishedBaselineNet: ceewPublishedNetINR,
-      silverRevenueDelta: Math.round(silverDeltaINR),
-      feedstockCostDelta: -Math.round(feedstockDeltaINR),
-      logisticsCostDelta: -Math.round(logisticsDeltaINR),
-      eprCertificateCredit: Math.round(eprCreditPerTonne)
-    },
-    assumptions: {
-      silverPriceINR_per_g: silverPrice,
-      silverRecoveryRate: silverRecovery,
-      feedstockCostINR_per_tonne: Math.round(feedstockCostPerTonne),
-      haulDistanceKm: haulKm,
-      freightRateINR_per_tkm: freightRate,
-      eprCreditINR_per_tonne: eprCreditPerTonne
-    },
-    referenceCases: data.economics_reference
+    netEconomicsINRPerTonne: selectedCase.net_inr_per_tonne,
+    selectedCase,
+    referenceCases: references
   };
 }

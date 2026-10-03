@@ -93,7 +93,7 @@ export const SCENARIO_CONFIGS: Record<ForecastScenarioId, ScenarioParameters> = 
     plantCapacityTonnesYr: 3600,
     eprFeePerTonneINR: 0,
     reverseLogisticsFreightINR_per_tkm: 12.0,
-    feedstockCostPerTonneINR: 27300,
+    feedstockCostPerTonneINR: Number.NaN,
     recoveryEfficiencyPct: 89.0,
     silverPriceINR_per_kg: 240000,
     aluminiumPriceINR_per_kg: 215,
@@ -112,7 +112,7 @@ export const SCENARIO_CONFIGS: Record<ForecastScenarioId, ScenarioParameters> = 
     plantCapacityTonnesYr: 3600,
     eprFeePerTonneINR: 0,
     reverseLogisticsFreightINR_per_tkm: 12.0,
-    feedstockCostPerTonneINR: 27300,
+    feedstockCostPerTonneINR: Number.NaN,
     recoveryEfficiencyPct: 89.0,
     silverPriceINR_per_kg: 240000,
     aluminiumPriceINR_per_kg: 215,
@@ -131,7 +131,7 @@ export const SCENARIO_CONFIGS: Record<ForecastScenarioId, ScenarioParameters> = 
     plantCapacityTonnesYr: 3600,
     eprFeePerTonneINR: 0,
     reverseLogisticsFreightINR_per_tkm: 12.0,
-    feedstockCostPerTonneINR: 27300,
+    feedstockCostPerTonneINR: Number.NaN,
     recoveryEfficiencyPct: 89.0,
     silverPriceINR_per_kg: 240000,
     aluminiumPriceINR_per_kg: 215,
@@ -150,7 +150,7 @@ export const SCENARIO_CONFIGS: Record<ForecastScenarioId, ScenarioParameters> = 
     plantCapacityTonnesYr: 3600,
     eprFeePerTonneINR: 0,
     reverseLogisticsFreightINR_per_tkm: 12.0,
-    feedstockCostPerTonneINR: 27300,
+    feedstockCostPerTonneINR: Number.NaN,
     recoveryEfficiencyPct: 89.0,
     silverPriceINR_per_kg: 240000,
     aluminiumPriceINR_per_kg: 215,
@@ -169,7 +169,7 @@ export const SCENARIO_CONFIGS: Record<ForecastScenarioId, ScenarioParameters> = 
     plantCapacityTonnesYr: 3600,
     eprFeePerTonneINR: 0,
     reverseLogisticsFreightINR_per_tkm: 12.0,
-    feedstockCostPerTonneINR: 27300,
+    feedstockCostPerTonneINR: Number.NaN,
     recoveryEfficiencyPct: 89.0,
     silverPriceINR_per_kg: 240000,
     aluminiumPriceINR_per_kg: 215,
@@ -188,7 +188,7 @@ export const SCENARIO_CONFIGS: Record<ForecastScenarioId, ScenarioParameters> = 
     plantCapacityTonnesYr: 3600,
     eprFeePerTonneINR: 0,
     reverseLogisticsFreightINR_per_tkm: 12.0,
-    feedstockCostPerTonneINR: 27300,
+    feedstockCostPerTonneINR: Number.NaN,
     recoveryEfficiencyPct: 89.0,
     silverPriceINR_per_kg: 240000,
     aluminiumPriceINR_per_kg: 215,
@@ -410,18 +410,18 @@ export function run_scenario(
   const publishedCase = econRef.Published_CEEW_Chemical;
 
   const canonicalEconomics = {
-    grossRecoveredValuePerTonneINR: 36759,
-    logisticsCostPerTonneINR: 4454,
-    processingCostPerTonneINR: 49100,
-    feedstockCostPerTonneINR: 27300,
-    eprContributionPerTonneINR: params.eprFeePerTonneINR ?? 0,
+    grossRecoveredValuePerTonneINR: Number.NaN,
+    logisticsCostPerTonneINR: CANONICAL_DATA.logistics_network.haul_distance_parameters.baseline_collection_cost_inr_per_tonne,
+    processingCostPerTonneINR: CANONICAL_DATA.recycling_routes.Chemical.report_cost_inr_per_tonne,
+    feedstockCostPerTonneINR: Number.NaN,
+    eprContributionPerTonneINR: Number.NaN,
     netMarginPerTonneINR: silverRepricedCase.net_inr_per_tonne,
-    breakEvenFeedstockPricePerTonneINR: 14959,
-    annualPlantEBITDA_INR_Cr: -2.14,
+    breakEvenFeedstockPricePerTonneINR: Number.NaN,
+    annualPlantEBITDA_INR_Cr: Number.NaN,
     projectIRRPct: null as number | null,
-    projectNPV_Cr: -15.8,
+    projectNPV_Cr: Number.NaN,
     paybackPeriodYears: null as number | null,
-    ebitdaMarginPct: -12.1,
+    ebitdaMarginPct: Number.NaN,
     referenceCases: econRef,
     silverRepricedNetINR: silverRepricedCase.net_inr_per_tonne,
     publishedCeewNetINR: publishedCase.net_inr_per_tonne,
@@ -429,20 +429,20 @@ export function run_scenario(
     financialAnalysis: {
       isEconomicallyAttractive: false,
       viabilityVerdict: 'MARGINAL / SUBSIDY DEPENDENT' as const,
-      attractivenessReasoning: 'Chemical recycling yields net -₹5,938/t under ₹240/g silver without policy support. With mandatory EPR certificate floor of ≥₹22/kg (+₹22,000/t), net margin reaches +₹16,062/t.',
-      projectNPV_Cr: -15.8,
+      attractivenessReasoning: silverRepricedCase.notes,
+      projectNPV_Cr: Number.NaN,
       projectIRRPct: null,
       paybackPeriodYears: null,
       discountedPaybackPeriodYears: null,
       terminalValueCr: 0,
-      breakEvenFeedstockINR_per_tonne: 14959,
-      breakEvenEprINR_per_tonne: 5938,
-      ebitdaAnnualCr: -2.14,
-      ebitdaMarginPct: -12.1,
-      totalCapitalInvestmentCr: 14.4,
-      discountRatePct: 10.0,
-      capacityUtilizationPct: 67.0,
-      annualThroughputTonnes: 2412,
+      breakEvenFeedstockINR_per_tonne: Number.NaN,
+      breakEvenEprINR_per_tonne: Number.NaN,
+      ebitdaAnnualCr: Number.NaN,
+      ebitdaMarginPct: Number.NaN,
+      totalCapitalInvestmentCr: Number.NaN,
+      discountRatePct: Number.NaN,
+      capacityUtilizationPct: Number.NaN,
+      annualThroughputTonnes: Number.NaN,
       dcfSchedule: []
     }
   };
@@ -478,7 +478,7 @@ export function run_scenario(
     hubCount: 6,
     netMarginPerTonneINR: silverRepricedCase.net_inr_per_tonne,
     projectIRRPct: null,
-    projectNPV_Cr: -15.8,
+    projectNPV_Cr: Number.NaN,
     viabilityVerdict: 'POLICY DEPENDENT (Requires EPR floor ≥₹22/kg to achieve viability)',
     co2eAvoidedMt: env.co2eAvoidedMt,
     policyMandateRequirement: 'Mandatory CEEW14 Category EPR targets + ₹22/kg certificate floor + bulk channelling duty',
@@ -487,7 +487,7 @@ export function run_scenario(
       `Under ${CANONICAL_SCENARIOS_META[activeScenarioId]?.name}, cumulative solar waste reaches ${m30.cumulative_waste_kt.toFixed(1)} kt by 2030 and ${m40.cumulative_waste_kt.toFixed(1)} kt by 2040.`,
       `Annual decommissioning flow in 2040 reaches ${m40.annual_waste_kt.toFixed(1)} kt/year, requiring ~${plantSizing.totalPlants} standard 3,600 tpa recycling facilities.`,
       `Technology Recommendation: Thermal delamination + hydrometallurgical chemical recovery maximizes silver recovery (74% yield, 44 g/t).`,
-      `Circularity Economics: Chemical recycling yields net -₹5,938/t under current market conditions, requiring an EPR certificate floor of ≥₹22/kg to achieve commercial bankability (+₹16,062/t).`,
+      `Circularity Economics: ${silverRepricedCase.notes}`,
       `Logistics Architecture: Hub-and-Spoke topology with district spoke pre-processing cuts average haul from 360 km to 100 km, saving ~₹3,217/tonne.`
     ]
   };
@@ -578,8 +578,8 @@ export function generate_management_summary(
 ): string {
   return `EXECUTIVE CIRCULARITY BRIEFING [${scenarioName.toUpperCase()}]:
 • Cumulative solar waste reaches ${milestones.cumulative2030Kt.toLocaleString()} kt by 2030 and ${milestones.cumulative2040Kt.toLocaleString()} kt by 2040 under the canonical IRENA/IEA-PVPS model.
-• Chemical recycling net economics stand at -₹5,938/t under current market conditions (silver repriced to ₹240/g).
-• Notifying a mandatory solar EPR certificate floor of ≥₹22/kg (+₹22,000/t) flips net margins to +₹16,062/t.
+• Chemical recycling net economics follow the canonical Silver Re-Priced Team Case.
+• Policy sensitivity follows the canonical EPR Floor Bankable Case.
 • Reverse logistics hub-and-spoke consolidation cuts average haul from 360 km to 100 km, saving ~₹3,217/t.
 • Cumulative decarbonization displacement represents approximately ${environmental.co2eAvoidedMt} Mt CO2e avoided by 2050.`;
 }
