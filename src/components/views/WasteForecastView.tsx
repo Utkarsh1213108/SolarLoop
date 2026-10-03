@@ -2,24 +2,27 @@ import React, { useState } from 'react';
 import { useScenario } from '../../context/ScenarioContext';
 import { TimeSeriesChart } from '../common/TimeSeriesChart';
 import { DataProvenanceBadge } from '../common/DataProvenanceBadge';
-import { BASELINE_SCENARIOS } from '../../data/researchBaseline';
+import { ForecastScenarioId } from '../../types';
 import { 
   TrendingUp, 
-  HelpCircle, 
   Sparkles, 
   ChevronDown, 
   ChevronUp, 
   Layers, 
   ShieldCheck,
-  Info
+  CheckCircle2,
+  AlertTriangle
 } from 'lucide-react';
 
 export const WasteForecastView: React.FC = () => {
   const { 
+    canonicalData,
     unit, 
     setUnit, 
     activeScenario, 
     setActiveScenario,
+    availableScenarios,
+    activeCanonicalScenario,
     simulationResult,
     setIsMethodologyOpen,
     askIntelligence
@@ -27,58 +30,28 @@ export const WasteForecastView: React.FC = () => {
 
   const [selectedHorizon, setSelectedHorizon] = useState<'2030' | '2040' | '2050'>('2040');
   const [showDetailedDecomposition, setShowDetailedDecomposition] = useState(false);
-  const [showCalibrationInspect, setShowCalibrationInspect] = useState(false);
+  const [showAssumptionsModal, setShowAssumptionsModal] = useState(false);
 
   const unitDivider = unit === 'Mt' ? 1000 : 1;
   const unitLabel = unit === 'Mt' ? 'Mt' : 'kt';
 
-  // Value for selected horizon
-  const horizonValueKt = selectedHorizon === '2030' 
-    ? simulationResult.milestones.cumulative2030Kt 
-    : selectedHorizon === '2040' 
-    ? simulationResult.milestones.cumulative2040Kt 
-    : simulationResult.milestones.cumulative2050Kt;
+  const milestoneData = activeCanonicalScenario.milestone_years[selectedHorizon];
+  const horizonValueDisplay = (milestoneData.cumulative_waste_kt / unitDivider).toLocaleString(undefined, { maximumFractionDigits: 1 });
+  const annualFlowDisplay = (milestoneData.annual_waste_kt / unitDivider).toLocaleString(undefined, { maximumFractionDigits: 1 });
 
-  const horizonValueDisplay = (horizonValueKt / unitDivider).toLocaleString();
-
-  // Research benchmark comparison matrix
-  const milestones = [
-    {
-      horizon: '2030',
-      baseRegular: 503,
-      baseEarlyLoss: 839,
-      conservativeRegular: 397,
-      focus: 'Infant failure & early rooftop replacement onset'
-    },
-    {
-      horizon: '2035',
-      baseRegular: 1042,
-      baseEarlyLoss: 2169,
-      conservativeRegular: 734,
-      focus: 'Repowering of early NSM Phase-1 & 2 utility parks'
-    },
-    {
-      horizon: '2040',
-      baseRegular: 2007,
-      baseEarlyLoss: 4833,
-      conservativeRegular: 1466,
-      focus: 'Exponential acceleration inflection point (25y EoL)'
-    },
-    {
-      horizon: '2047',
-      baseRegular: 5658,
-      baseEarlyLoss: 12108,
-      conservativeRegular: 4360,
-      focus: 'India Centenary Benchmark (~37 Mt CO2e avoided)'
-    },
-    {
-      horizon: '2050',
-      baseRegular: 8874,
-      baseEarlyLoss: 16768,
-      conservativeRegular: 6756,
-      focus: 'Peak wave of India 500 GW net-zero additions'
-    }
-  ];
+  // 6 Canonical Scenarios Table
+  const scenarioMatrix = availableScenarios.map(sc => {
+    const data = canonicalData.forecast_outputs[sc.canonicalKey];
+    return {
+      ...sc,
+      cum2030: data.milestone_years['2030'].cumulative_waste_kt,
+      cum2040: data.milestone_years['2040'].cumulative_waste_kt,
+      cum2050: data.milestone_years['2050'].cumulative_waste_kt,
+      ann2040: data.milestone_years['2040'].annual_waste_kt,
+      comm2040: data.milestone_years['2040'].commissioning_scrap_kt,
+      ops2040: data.milestone_years['2040'].operational_failure_kt
+    };
+  });
 
   return (
     <div className="p-6 space-y-6 max-w-7xl mx-auto">
@@ -86,14 +59,14 @@ export const WasteForecastView: React.FC = () => {
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-slate-200">
         <div>
           <h1 className="text-xl font-bold text-slate-900 tracking-tight">
-            Solar Panel Waste Forecast
+            Solar Panel Waste Forecast Engine
           </h1>
           <p className="text-xs text-slate-500 mt-1 max-w-3xl">
-            Causal cohort-based model projecting solar PV decommissioning volumes across India through 2050.
+            National decommissioning volume forecasts for India (2026–2050) strictly grounded on the canonical IRENA/IEA-PVPS (2016) Weibull framework and CEEW (2024–2025) benchmarks.
           </p>
         </div>
         <div className="flex items-center gap-3">
-          <DataProvenanceBadge tier="MODEL OUTPUT" sourceText="SolarLoop model scenario" />
+          <DataProvenanceBadge tier="VERIFIED SOURCE" sourceText="solar_waste_model_v2.py (FROZEN)" />
           <button
             type="button"
             onClick={() => askIntelligence('Why does waste accelerate after 2040?')}
@@ -105,63 +78,53 @@ export const WasteForecastView: React.FC = () => {
         </div>
       </div>
 
-      {/* Simple Controls (Section 5 requirement) */}
+      {/* Scenario & Horizon Selector */}
       <div className="bg-white border border-slate-200 rounded-xl p-5 shadow-xs space-y-4">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {/* Scenario Selector */}
-          <div>
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+          {/* 6 Scenarios Dropdown / Segmented Grid */}
+          <div className="flex-1">
             <label className="block text-xs font-semibold text-slate-700 mb-2">
-              Select Scenario:
+              Select Canonical Scenario (3 Trajectories × 2 Loss Curves):
             </label>
-            <div className="inline-flex rounded-lg border border-slate-200 p-1 bg-slate-50 w-full sm:w-auto">
-              <button
-                type="button"
-                onClick={() => setActiveScenario('base_regular')}
-                className={`px-3 py-1.5 text-xs font-semibold rounded-md transition-colors cursor-pointer ${
-                  activeScenario === 'base_regular'
-                    ? 'bg-white text-slate-900 shadow-xs'
-                    : 'text-slate-600 hover:text-slate-900'
-                }`}
-              >
-                Base Regular (25y EoL)
-              </button>
-              <button
-                type="button"
-                onClick={() => setActiveScenario('base_early_loss')}
-                className={`px-3 py-1.5 text-xs font-semibold rounded-md transition-colors cursor-pointer ${
-                  activeScenario === 'base_early_loss'
-                    ? 'bg-white text-teal-900 shadow-xs'
-                    : 'text-slate-600 hover:text-slate-900'
-                }`}
-              >
-                Early Loss (Defects & Attrition)
-              </button>
-              <button
-                type="button"
-                onClick={() => setActiveScenario('conservative_regular')}
-                className={`px-3 py-1.5 text-xs font-semibold rounded-md transition-colors cursor-pointer ${
-                  activeScenario === 'conservative_regular'
-                    ? 'bg-white text-slate-900 shadow-xs'
-                    : 'text-slate-600 hover:text-slate-900'
-                }`}
-              >
-                Conservative
-              </button>
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+              {availableScenarios.map((sc) => {
+                const isSelected = activeScenario === sc.id;
+                return (
+                  <button
+                    key={sc.id}
+                    type="button"
+                    onClick={() => setActiveScenario(sc.id)}
+                    className={`p-2.5 rounded-lg text-left border transition-all cursor-pointer ${
+                      isSelected
+                        ? 'bg-teal-50/80 border-teal-600 text-teal-950 ring-1 ring-teal-600'
+                        : 'bg-slate-50/60 border-slate-200 text-slate-700 hover:bg-slate-100'
+                    }`}
+                  >
+                    <div className="font-semibold text-xs flex items-center justify-between">
+                      <span>{sc.name}</span>
+                      {isSelected && <CheckCircle2 className="w-3.5 h-3.5 text-teal-600" />}
+                    </div>
+                    <div className="text-[11px] text-slate-500 font-mono mt-0.5">
+                      {sc.capacityPath.split(' ')[0]} · α={sc.alpha}
+                    </div>
+                  </button>
+                );
+              })}
             </div>
           </div>
 
           {/* Horizon Selector */}
-          <div>
+          <div className="lg:w-48 shrink-0">
             <label className="block text-xs font-semibold text-slate-700 mb-2">
-              Forecast Horizon:
+              Milestone Horizon:
             </label>
-            <div className="inline-flex rounded-lg border border-slate-200 p-1 bg-slate-50">
+            <div className="inline-flex rounded-lg border border-slate-200 p-1 bg-slate-50 w-full justify-between">
               {(['2030', '2040', '2050'] as const).map((yr) => (
                 <button
                   key={yr}
                   type="button"
                   onClick={() => setSelectedHorizon(yr)}
-                  className={`px-4 py-1.5 text-xs font-mono font-semibold rounded-md transition-colors cursor-pointer ${
+                  className={`flex-1 py-1.5 text-xs font-mono font-semibold rounded-md transition-colors cursor-pointer text-center ${
                     selectedHorizon === yr
                       ? 'bg-white text-slate-900 shadow-xs'
                       : 'text-slate-600 hover:text-slate-900'
@@ -175,168 +138,112 @@ export const WasteForecastView: React.FC = () => {
         </div>
       </div>
 
-      {/* Interactive Time Series Chart */}
+      {/* Canonical Time Series Chart */}
       <TimeSeriesChart
-        title={`Projected Waste Trajectory (${activeScenario.replace('_', ' ').toUpperCase()})`}
+        title={`Solar Waste Accumulation (${activeCanonicalScenario.capacity_path} Path · α=${activeCanonicalScenario.alpha})`}
         showScenarioComparison={true}
       />
 
-      {/* Immediate Clear Executive Sentence & Drivers (Section 5 Requirement) */}
+      {/* Executive Key Finding Banner */}
       <div className="bg-white border border-slate-200 rounded-xl p-5 shadow-xs space-y-4">
-        {/* Simple sentence immediately below chart */}
         <div className="p-4 bg-teal-50/70 border border-teal-200 rounded-lg flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <p className="text-sm text-slate-800 leading-relaxed font-sans">
-            Under the selected scenario, cumulative solar waste reaches approximately{' '}
+            Under <strong className="text-slate-900">{activeCanonicalScenario.capacity_path} Path ({activeCanonicalScenario.alpha === 5.3759 ? 'Regular wear-out' : 'Early-loss stress'})</strong>, cumulative solar waste reaches{' '}
             <strong className="text-teal-900 font-mono text-base font-bold">
               {horizonValueDisplay} {unitLabel}
             </strong>{' '}
-            by <strong className="font-mono text-slate-900">{selectedHorizon}</strong>.
+            by <strong className="font-mono text-slate-900">{selectedHorizon}</strong>, with annual decommissioning flow of{' '}
+            <strong className="font-mono text-slate-900">{annualFlowDisplay} {unitLabel}/year</strong>.
           </p>
           <button
             type="button"
             onClick={() => setIsMethodologyOpen(true)}
             className="text-xs font-semibold text-teal-800 hover:text-teal-950 underline shrink-0 cursor-pointer"
           >
-            View methodology
+            Methodology & Formulas
           </button>
         </div>
 
-        {/* Transparent Calibration Note (Section 2 Requirement) */}
-        <div className="p-3.5 bg-slate-50 border border-slate-200 rounded-lg text-xs space-y-3">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-            <div className="flex items-center gap-2 flex-wrap">
-              <span className="font-mono font-bold text-slate-700 uppercase text-[10px] bg-white px-2 py-0.5 rounded border border-slate-300">
-                Calibration Note
-              </span>
-              <span className="text-slate-700">
-                <strong>SolarLoop cohort model</strong> vs <strong>Research reference scenario:</strong>{' '}
-                {simulationResult.calibration.isDivergent 
-                  ? <span className="text-amber-800 font-semibold">Model divergence driven by assumptions ({simulationResult.calibration.diffPct > 0 ? `+${simulationResult.calibration.diffPct}%` : `${simulationResult.calibration.diffPct}%`} vs reference baseline).</span>
-                  : <span className="text-teal-800 font-medium">Calibrated closely with published research reference baseline (±5%).</span>
-                }
-              </span>
-            </div>
-            <div className="flex items-center gap-3">
-              <span className="text-[11px] font-mono text-slate-500">
-                Ref 2040: {(simulationResult.calibration.ref2040 / unitDivider).toLocaleString()} {unitLabel}
-              </span>
-              <button
-                type="button"
-                onClick={() => setShowCalibrationInspect(!showCalibrationInspect)}
-                className="text-xs font-semibold text-teal-800 hover:text-teal-950 underline cursor-pointer inline-flex items-center gap-1"
-              >
-                <span>{showCalibrationInspect ? 'Hide assumptions' : 'Inspect assumptions'}</span>
-                {showCalibrationInspect ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
-              </button>
-            </div>
-          </div>
-
-          {/* Inspect Calibration Assumptions Drawer */}
-          {showCalibrationInspect && (
-            <div className="pt-3 border-t border-slate-200 space-y-2.5">
-              <div className="flex items-center justify-between text-[11px] text-slate-500">
-                <span className="font-semibold text-slate-700">Driver Comparison: Active Cohort Model vs Reference Scenario</span>
-                <span className="font-mono text-[10px]">Research literature calibration points</span>
-              </div>
-              <div className="overflow-x-auto rounded border border-slate-200 bg-white">
-                <table className="w-full text-left text-xs">
-                  <thead className="bg-slate-100 text-slate-600 font-semibold border-b border-slate-200">
-                    <tr>
-                      <th className="py-2 px-3">Parameter</th>
-                      <th className="py-2 px-3 text-teal-900 font-mono">SolarLoop Cohort Model</th>
-                      <th className="py-2 px-3 text-slate-700 font-mono">Research Reference Scenario</th>
-                      <th className="py-2 px-3 text-slate-600">Model Impact / Variance</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-slate-100 font-mono">
-                    {simulationResult.calibration.assumptionsComparison?.map((row, idx) => (
-                      <tr key={idx} className="hover:bg-slate-50/50">
-                        <td className="py-2 px-3 font-medium text-slate-900 font-sans">{row.param}</td>
-                        <td className="py-2 px-3 font-semibold text-teal-800">{row.activeValue}</td>
-                        <td className="py-2 px-3 text-slate-600">{row.referenceValue}</td>
-                        <td className="py-2 px-3 text-slate-600 font-sans text-[11px]">{row.divergenceImpact}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-              <p className="text-[11px] text-slate-500 italic">
-                Note: Research scenarios (CEEW/BridgeToIndia/IRENA literature) reflect model benchmarks, not statutory government quotas. SolarLoop evaluates discrete yearly probability mass via Weibull CDF(age + 1) - Weibull CDF(age).
-              </p>
-            </div>
-          )}
-        </div>
-
-        {/* What is driving this? (3 major drivers) */}
+        {/* Canonical 3 Drivers */}
         <div>
           <h3 className="text-xs font-bold uppercase tracking-wider text-slate-700 mb-3">
-            What is driving this?
+            Canonical Causal Drivers (solar_waste_model_v2.py)
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
             <div className="p-3 rounded-lg border border-slate-200 bg-slate-50/60 space-y-1">
-              <span className="font-semibold text-slate-900 font-sans">1. Growing Installed Capacity</span>
+              <span className="font-semibold text-slate-900 font-sans">1. Commissioning Loss (2.3%)</span>
               <p className="text-slate-600 leading-relaxed">
-                India's operational solar fleet expanded from 10 GW in 2017 to &gt;85 GW today. As additions approach 25–40 GW annually, the physical mass of modules in service grows exponentially.
+                Occurs immediately upon installation due to port handling, transit breakage, and EPC installation scrap prior to grid synchronization (CEEW 2024 / Bridge to India benchmark).
               </p>
             </div>
 
             <div className="p-3 rounded-lg border border-slate-200 bg-slate-50/60 space-y-1">
-              <span className="font-semibold text-slate-900 font-sans">2. Retirement of Older Cohorts</span>
+              <span className="font-semibold text-slate-900 font-sans">2. Surviving Cohort Weibull Wearout</span>
               <p className="text-slate-600 leading-relaxed">
-                Early installations from the National Solar Mission (commissioned 2011–2016) reach their 25-year design lifespan between 2036 and 2041, triggering the first large EoL wave.
+                Calculated on surviving mass using IRENA/IEA-PVPS (2016) parameters: characteristic life β = 30.0 years, shape α = 5.3759 (Regular) or α = 2.4928 (Early-loss).
               </p>
             </div>
 
             <div className="p-3 rounded-lg border border-slate-200 bg-slate-50/60 space-y-1">
-              <span className="font-semibold text-slate-900 font-sans">3. Early-Loss & Replacement</span>
+              <span className="font-semibold text-slate-900 font-sans">3. Mass Intensity (t/MW) Evolution</span>
               <p className="text-slate-600 leading-relaxed">
-                Transport micro-cracks, harsh desert thermal cycling, and cyclone wind damage cause 3–5% of modules to exit service 10–15 years before natural end-of-life.
+                65.0 t/MW for historic cohorts (≤2022) transitioning to 58.0 t/MW for vintages &gt;2022 due to wafer thinning and high-efficiency cell architectures.
               </p>
             </div>
           </div>
         </div>
 
-        {/* Collapsible Detailed Stream Decomposition */}
+        {/* Collapsible Canonical 6-Scenario Matrix */}
         <div className="pt-2 border-t border-slate-100">
           <button
             type="button"
             onClick={() => setShowDetailedDecomposition(!showDetailedDecomposition)}
             className="w-full py-2 text-xs font-semibold text-slate-600 hover:text-slate-900 flex items-center justify-between transition-colors cursor-pointer"
           >
-            <span>View Detailed Waste-Stream Decomposition Table</span>
+            <span>View Complete 6-Scenario Canonical Milestone Matrix (2030, 2040, 2050)</span>
             {showDetailedDecomposition ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
           </button>
 
           {showDetailedDecomposition && (
-            <div className="mt-3 overflow-x-auto">
+            <div className="mt-3 overflow-x-auto rounded-lg border border-slate-200">
               <table className="w-full text-xs text-left">
-                <thead className="bg-slate-50 text-slate-600 font-semibold border-b border-slate-200">
+                <thead className="bg-slate-100 text-slate-700 font-semibold border-b border-slate-200">
                   <tr>
-                    <th className="py-2 px-3">Horizon</th>
-                    <th className="py-2 px-3 text-right">Base Regular</th>
-                    <th className="py-2 px-3 text-right">Base Early-Loss</th>
-                    <th className="py-2 px-3 text-right">Conservative</th>
-                    <th className="py-2 px-3">Primary Operational Driver</th>
+                    <th className="py-2.5 px-3">Scenario</th>
+                    <th className="py-2.5 px-3">Capacity Trajectory</th>
+                    <th className="py-2.5 px-3 text-center">Weibull α</th>
+                    <th className="py-2.5 px-3 text-right">2030 Cumul.</th>
+                    <th className="py-2.5 px-3 text-right font-bold text-slate-900">2040 Cumul.</th>
+                    <th className="py-2.5 px-3 text-right">2050 Cumul.</th>
+                    <th className="py-2.5 px-3 text-right">2040 Annual Flow</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100 font-mono tabular-nums">
-                  {milestones.map((m) => (
-                    <tr key={m.horizon} className="hover:bg-slate-50/50">
-                      <td className="py-2.5 px-3 font-bold text-slate-900 font-sans">{m.horizon}</td>
-                      <td className="py-2.5 px-3 text-right font-medium text-slate-800">
-                        {(m.baseRegular / unitDivider).toLocaleString()} {unitLabel}
-                      </td>
-                      <td className="py-2.5 px-3 text-right font-bold text-teal-800">
-                        {(m.baseEarlyLoss / unitDivider).toLocaleString()} {unitLabel}
-                      </td>
-                      <td className="py-2.5 px-3 text-right text-slate-600">
-                        {(m.conservativeRegular / unitDivider).toLocaleString()} {unitLabel}
-                      </td>
-                      <td className="py-2.5 px-3 font-sans text-slate-600 text-[11px]">
-                        {m.focus}
-                      </td>
-                    </tr>
-                  ))}
+                  {scenarioMatrix.map((m) => {
+                    const isCurrent = activeScenario === m.id;
+                    return (
+                      <tr key={m.id} className={`hover:bg-slate-50/70 ${isCurrent ? 'bg-teal-50/40 font-bold' : ''}`}>
+                        <td className="py-2.5 px-3 font-sans font-semibold text-slate-900 flex items-center gap-1.5">
+                          {isCurrent && <span className="w-1.5 h-1.5 rounded-full bg-teal-600 inline-block" />}
+                          <span>{m.name}</span>
+                        </td>
+                        <td className="py-2.5 px-3 text-slate-600 font-sans">{m.capacityPath}</td>
+                        <td className="py-2.5 px-3 text-center text-slate-600">{m.alpha}</td>
+                        <td className="py-2.5 px-3 text-right text-slate-700">
+                          {(m.cum2030 / unitDivider).toLocaleString(undefined, { maximumFractionDigits: 1 })} {unitLabel}
+                        </td>
+                        <td className="py-2.5 px-3 text-right font-bold text-teal-900">
+                          {(m.cum2040 / unitDivider).toLocaleString(undefined, { maximumFractionDigits: 1 })} {unitLabel}
+                        </td>
+                        <td className="py-2.5 px-3 text-right text-slate-700">
+                          {(m.cum2050 / unitDivider).toLocaleString(undefined, { maximumFractionDigits: 1 })} {unitLabel}
+                        </td>
+                        <td className="py-2.5 px-3 text-right text-slate-600">
+                          {(m.ann2040 / unitDivider).toLocaleString(undefined, { maximumFractionDigits: 1 })} {unitLabel}/yr
+                        </td>
+                      </tr>
+                    );
+                  })}
                 </tbody>
               </table>
             </div>

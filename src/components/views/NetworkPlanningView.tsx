@@ -32,7 +32,7 @@ export const NetworkPlanningView: React.FC = () => {
 
   const handleSelectTier = (tier: PlantCapacityTier) => {
     setCapacityTier(tier);
-    updateScenarioParam('plantCapacityTonnesYr', PLANT_CAPACITY_TIERS[tier].capacityTonnes);
+    updateScenarioParam('plantCapacityTonnesYr', PLANT_CAPACITY_TIERS[tier].capacityTonnesYr);
   };
 
   const requiredCapacityKt = simulationResult.infrastructure.requiredCapacity2040KtYr;
@@ -94,7 +94,7 @@ export const NetworkPlanningView: React.FC = () => {
               <p className="text-[11px] text-slate-300 mt-0.5">{inaNetworkMode ? '700+ INA Partner Depots' : 'District staging yards'}</p>
             </div>
             <div className="text-[10px] text-teal-300 font-mono mt-2 pt-2 border-t border-slate-700/60">
-              Freight: ₹{transportMetrics.freightPerTonneINR}/t
+              Freight: ₹{transportMetrics.totalLogisticsPerTonneINR}/t
             </div>
           </div>
 
@@ -160,10 +160,10 @@ export const NetworkPlanningView: React.FC = () => {
                   <div className="flex items-center justify-between">
                     <span className="text-xs font-bold text-slate-900">{t.name}</span>
                     <span className="text-[11px] font-mono font-semibold text-teal-800">
-                      {t.capacityKt} kt/yr
+                      {t.capacityTonnesYr / 1000} kt/yr
                     </span>
                   </div>
-                  <p className="text-[11px] text-slate-500 mt-1">{t.desc}</p>
+                  <p className="text-[11px] text-slate-500 mt-1">{t.description}</p>
                 </div>
               );
             })}
@@ -183,7 +183,7 @@ export const NetworkPlanningView: React.FC = () => {
           <div>
             <span className="text-slate-400 text-[10px] uppercase">2040 Required Capacity:</span>
             <div className="text-base font-bold text-teal-900 mt-0.5">
-              {plantSizing.requiredCapacityTonnesYr.toLocaleString()} tonnes / year
+              {(plantSizing.annualFlowKt * 1000).toLocaleString()} tonnes / year
             </div>
             <div className="text-[10px] text-slate-500 mt-0.5">({requiredCapacityKt} kt/year annual waste inflow)</div>
           </div>

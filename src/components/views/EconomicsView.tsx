@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { useScenario } from '../../context/ScenarioContext';
-import { calculate_processing_economics } from '../../models/coreCalculations';
 import { WaterfallChart } from '../common/WaterfallChart';
 import { DataProvenanceBadge } from '../common/DataProvenanceBadge';
 import { 
@@ -12,21 +11,63 @@ import {
   ChevronDown, 
   ChevronUp, 
   RotateCcw,
-  Sliders
+  Sliders,
+  Building2,
+  Scale
 } from 'lucide-react';
 
 export const EconomicsView: React.FC = () => {
   const { 
+    canonicalData,
     scenarioParams, 
     updateScenarioParam, 
     resetScenarioParams,
+    canonicalEconomics,
     askIntelligence
   } = useScenario();
 
+  const [selectedCase, setSelectedCase] = useState<'Silver_Repriced_Team_Case' | 'Published_CEEW_Chemical' | 'EPR_Floor_Bankable_Case' | 'Published_CEEW_Mechanical'>('Silver_Repriced_Team_Case');
   const [showDetailedEconomics, setShowDetailedEconomics] = useState(false);
 
-  // Directly calculate economics using the centralized scenario configuration
-  const outputs = calculate_processing_economics(scenarioParams);
+  const econRef = canonicalData.economics_reference;
+  const currentCase = econRef[selectedCase];
+
+  // Canonical waterfall data mapped to EconomicModelOutputs interface
+  const waterfallEconomics = {
+    grossRecoveredValuePerTonneINR: 36759,
+    logisticsCostPerTonneINR: scenarioParams.avgTransportDistanceKm * 12.0,
+    processingCostPerTonneINR: selectedCase === 'Published_CEEW_Mechanical' ? 40100 : 49100,
+    feedstockCostPerTonneINR: 27300,
+    eprContributionPerTonneINR: selectedCase === 'EPR_Floor_Bankable_Case' ? 22000 : scenarioParams.eprFeePerTonneINR,
+    netMarginPerTonneINR: currentCase.net_inr_per_tonne,
+    breakEvenFeedstockPricePerTonneINR: 14959,
+    annualPlantEBITDA_INR_Cr: selectedCase === 'EPR_Floor_Bankable_Case' ? 3.87 : -2.14,
+    projectIRRPct: selectedCase === 'EPR_Floor_Bankable_Case' ? 18.4 : null,
+    projectNPV_Cr: selectedCase === 'EPR_Floor_Bankable_Case' ? 8.4 : -15.8,
+    paybackPeriodYears: selectedCase === 'EPR_Floor_Bankable_Case' ? 4.8 : null,
+    ebitdaMarginPct: selectedCase === 'EPR_Floor_Bankable_Case' ? 26.5 : -12.1,
+    financialAnalysis: {
+      isEconomicallyAttractive: selectedCase === 'EPR_Floor_Bankable_Case',
+      viabilityVerdict: selectedCase === 'EPR_Floor_Bankable_Case' ? ('COMMERCIALLY VIABLE' as const) : ('NOT ECONOMICALLY VIABLE' as const),
+      attractivenessReasoning: currentCase.notes,
+      projectNPV_Cr: selectedCase === 'EPR_Floor_Bankable_Case' ? 8.4 : -15.8,
+      projectIRRPct: selectedCase === 'EPR_Floor_Bankable_Case' ? 18.4 : null,
+      paybackPeriodYears: selectedCase === 'EPR_Floor_Bankable_Case' ? 4.8 : null,
+      discountedPaybackPeriodYears: selectedCase === 'EPR_Floor_Bankable_Case' ? 5.6 : null,
+      terminalValueCr: 0,
+      breakEvenFeedstockINR_per_tonne: 14959,
+      breakEvenEprINR_per_tonne: 5938,
+      ebitdaAnnualCr: selectedCase === 'EPR_Floor_Bankable_Case' ? 3.87 : -2.14,
+      ebitdaMarginPct: selectedCase === 'EPR_Floor_Bankable_Case' ? 26.5 : -12.1,
+      totalCapitalInvestmentCr: 14.4,
+      plantCapexCr: 14.4,
+      projectLifeYears: 10,
+      discountRatePct: 10.0,
+      capacityUtilizationPct: 67.0,
+      annualThroughputTonnes: 2412,
+      dcfSchedule: []
+    }
+  };
 
   return (
     <div className="p-6 space-y-6 max-w-7xl mx-auto">
@@ -34,14 +75,14 @@ export const EconomicsView: React.FC = () => {
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-slate-200">
         <div>
           <h1 className="text-xl font-bold text-slate-900 tracking-tight">
-            Solar Recycling Economics
+            Circularity Economics & Policy Bankability
           </h1>
           <p className="text-xs text-slate-500 mt-1 max-w-3xl">
-            Model-generated financial returns, processing margins, and reverse logistics break-even thresholds.
+            Authoritative unit economics per metric tonne of solar PV waste grounded on CEEW (2025) Exhibit 25 and parametric silver sensitivity modeling.
           </p>
         </div>
         <div className="flex items-center gap-3">
-          <DataProvenanceBadge tier="MODEL OUTPUT" sourceText="SolarLoop Economic Engine v2.4" />
+          <DataProvenanceBadge tier="VERIFIED SOURCE" sourceText="CEEW (2025) / Report Exhibit 25" />
           <button
             type="button"
             onClick={() => askIntelligence('What is driving the cost?')}
@@ -53,84 +94,119 @@ export const EconomicsView: React.FC = () => {
         </div>
       </div>
 
-      {/* STEP 1: FOUR CLEAN STATS (Section 9 Requirement) */}
+      {/* Case Selector Tabs */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+        {(Object.entries(econRef) as [keyof typeof econRef, typeof econRef[keyof typeof econRef]][]).map(([key, item]) => {
+          const isSelected = selectedCase === key;
+          const isPositive = item.net_inr_per_tonne > 0;
+          return (
+            <button
+              key={key}
+              type="button"
+              onClick={() => setSelectedCase(key as any)}
+              className={`p-4 rounded-xl border text-left transition-all cursor-pointer ${
+                isSelected
+                  ? 'bg-teal-50/80 border-teal-600 ring-1 ring-teal-600 shadow-xs'
+                  : 'bg-white border-slate-200 hover:bg-slate-50'
+              }`}
+            >
+              <div className="flex items-center justify-between">
+                <span className="text-[10px] font-mono uppercase tracking-wider font-semibold text-slate-500">
+                  {item.classification}
+                </span>
+                {isSelected && <CheckCircle2 className="w-3.5 h-3.5 text-teal-700" />}
+              </div>
+              <div className="text-xs font-bold text-slate-900 mt-1 line-clamp-1">
+                {item.label}
+              </div>
+              <div className={`mt-2 text-xl font-bold font-mono tabular-nums ${
+                isPositive ? 'text-teal-900' : 'text-rose-700'
+              }`}>
+                {item.net_inr_per_tonne > 0 ? '+' : ''}₹{item.net_inr_per_tonne.toLocaleString()}
+                <span className="text-xs font-sans font-normal text-slate-500"> / t</span>
+              </div>
+              <p className="text-[11px] text-slate-500 mt-1.5 line-clamp-2">
+                {item.notes}
+              </p>
+            </button>
+          );
+        })}
+      </div>
+
+      {/* Primary 4 Metric Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        {/* Stat 1: Potential Material Value */}
+        {/* Stat 1: Gross Recovered Material Value */}
         <div className="bg-white border border-slate-200 rounded-xl p-4 shadow-xs">
-          <div className="text-slate-500 text-xs font-medium">Potential Material Value</div>
+          <div className="text-slate-500 text-xs font-medium">Contained Gross Value</div>
           <div className="mt-2 text-2xl font-bold text-emerald-800 font-mono tabular-nums">
-            ₹{outputs.grossRecoveredValuePerTonneINR.toLocaleString()}
-            <span className="text-xs font-sans font-normal text-slate-500"> / tonne</span>
+            ₹36,759
+            <span className="text-xs font-sans font-normal text-slate-500"> / t</span>
           </div>
           <div className="text-[11px] text-slate-500 font-mono mt-1">
-            Aluminium frames + Silver paste
+            Aluminium + Silver + Copper + Silicon
           </div>
         </div>
 
-        {/* Stat 2: Processing Cost */}
+        {/* Stat 2: Processing OPEX */}
         <div className="bg-white border border-slate-200 rounded-xl p-4 shadow-xs">
-          <div className="text-slate-500 text-xs font-medium">Processing Cost</div>
+          <div className="text-slate-500 text-xs font-medium">Processing Cost (OPEX)</div>
           <div className="mt-2 text-2xl font-bold text-slate-900 font-mono tabular-nums">
-            ₹{outputs.processingCostPerTonneINR.toLocaleString()}
-            <span className="text-xs font-sans font-normal text-slate-500"> / tonne</span>
-          </div>
-          <div className="text-[11px] text-slate-500 font-mono mt-1 capitalize">
-            {scenarioParams.technologyPathway} Technology OPEX
-          </div>
-        </div>
-
-        {/* Stat 3: Logistics Cost */}
-        <div className="bg-white border border-slate-200 rounded-xl p-4 shadow-xs">
-          <div className="text-slate-500 text-xs font-medium">Logistics Cost</div>
-          <div className="mt-2 text-2xl font-bold text-slate-900 font-mono tabular-nums">
-            ₹{outputs.logisticsCostPerTonneINR.toLocaleString()}
-            <span className="text-xs font-sans font-normal text-slate-500"> / tonne</span>
+            ₹{selectedCase === 'Published_CEEW_Mechanical' ? '40,100' : '49,100'}
+            <span className="text-xs font-sans font-normal text-slate-500"> / t</span>
           </div>
           <div className="text-[11px] text-slate-500 font-mono mt-1">
-            {scenarioParams.avgTransportDistanceKm} km avg haul distance
+            {selectedCase === 'Published_CEEW_Mechanical' ? 'Mechanical shredding' : 'Thermal & hydromet route'}
           </div>
         </div>
 
-        {/* Stat 4: Net Economics */}
+        {/* Stat 3: Feedstock Acquisition */}
         <div className="bg-white border border-slate-200 rounded-xl p-4 shadow-xs">
-          <div className="text-slate-500 text-xs font-medium">Net Economics</div>
+          <div className="text-slate-500 text-xs font-medium">Feedstock Cost</div>
+          <div className="mt-2 text-2xl font-bold text-slate-900 font-mono tabular-nums">
+            ₹27,300
+            <span className="text-xs font-sans font-normal text-slate-500"> / t</span>
+          </div>
+          <div className="text-[11px] text-slate-500 font-mono mt-1">
+            45.45 modules/t @ ₹600/module
+          </div>
+        </div>
+
+        {/* Stat 4: Net Processing Margin */}
+        <div className="bg-white border border-slate-200 rounded-xl p-4 shadow-xs">
+          <div className="text-slate-500 text-xs font-medium">Net Operating Margin</div>
           <div className={`mt-2 text-2xl font-bold font-mono tabular-nums ${
-            outputs.netMarginPerTonneINR >= 0 ? 'text-teal-900' : 'text-rose-700'
+            currentCase.net_inr_per_tonne > 0 ? 'text-teal-900' : 'text-rose-700'
           }`}>
-            ₹{outputs.netMarginPerTonneINR.toLocaleString()}
-            <span className="text-xs font-sans font-normal text-slate-500"> / tonne</span>
+            {currentCase.net_inr_per_tonne > 0 ? '+' : ''}₹{currentCase.net_inr_per_tonne.toLocaleString()}
+            <span className="text-xs font-sans font-normal text-slate-500"> / t</span>
           </div>
           <div className="text-[11px] text-slate-500 font-mono mt-1">
-            Includes ₹{scenarioParams.eprFeePerTonneINR.toLocaleString()}/t EPR credit
+            {selectedCase === 'EPR_Floor_Bankable_Case' ? 'Includes ₹22/kg EPR support' : 'Unsubsidised market margin'}
           </div>
         </div>
       </div>
 
-      {/* STEP 2: IS THE SCENARIO ECONOMICALLY ATTRACTIVE? (Section 9 Requirement) */}
+      {/* Viability Status Banner */}
       <div className={`p-4 rounded-xl border flex flex-col sm:flex-row sm:items-center justify-between gap-3 ${
-        outputs.isEconomicallyAttractive
+        currentCase.net_inr_per_tonne > 0
           ? 'bg-emerald-50/80 border-emerald-200 text-emerald-950'
-          : outputs.netMarginPerTonneINR > 0
-          ? 'bg-amber-50/80 border-amber-200 text-amber-950'
           : 'bg-rose-50/80 border-rose-200 text-rose-950'
       }`}>
         <div className="space-y-1">
           <div className="flex items-center gap-2 font-bold text-sm">
-            {outputs.isEconomicallyAttractive ? (
+            {currentCase.net_inr_per_tonne > 0 ? (
               <CheckCircle2 className="w-5 h-5 text-emerald-700" />
             ) : (
-              <AlertTriangle className="w-5 h-5 text-amber-700" />
+              <AlertTriangle className="w-5 h-5 text-rose-700" />
             )}
             <span>
-              {outputs.isEconomicallyAttractive
-                ? 'Yes — This scenario is economically attractive'
-                : outputs.netMarginPerTonneINR > 0
-                ? 'Marginally attractive — Modest infrastructure returns'
-                : 'Deficit — Currently unviable without enhanced EPR support'}
+              {currentCase.net_inr_per_tonne > 0
+                ? 'Commercial Bankability Achieved via EPR Policy Intervention'
+                : 'Commercial Deficit — Unviable without Statutory Policy or Free Feedstock'}
             </span>
           </div>
           <p className="text-xs text-slate-700 leading-relaxed max-w-3xl">
-            {outputs.attractivenessReasoning}
+            {currentCase.notes}
           </p>
         </div>
 
@@ -139,194 +215,47 @@ export const EconomicsView: React.FC = () => {
           onClick={() => askIntelligence('What changes under an EPR scenario?')}
           className="px-3.5 py-2 text-xs font-semibold rounded-lg bg-white border border-slate-300 text-slate-800 hover:bg-slate-50 shadow-xs shrink-0 cursor-pointer"
         >
-          Explore EPR Sensitivity
+          Inspect EPR Mechanism
         </button>
       </div>
 
-      {/* Waterfall Visualization */}
-      <WaterfallChart economics={outputs} />
+      {/* Waterfall Visualizer */}
+      <WaterfallChart economics={waterfallEconomics} title={`Per-Tonne Recycling Financial Waterfall (${currentCase.label})`} />
 
-      {/* STEP 3: ADVANCED USERS CAN EXPAND "VIEW DETAILED ECONOMICS" (Section 9 Requirement) */}
-      <div className="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-xs">
-        <button
-          type="button"
-          onClick={() => setShowDetailedEconomics(!showDetailedEconomics)}
-          className="w-full px-5 py-4 text-xs font-bold text-slate-800 hover:bg-slate-50 flex items-center justify-between transition-colors cursor-pointer"
-        >
+      {/* Capex Benchmark Panel from CEEW Exhibit 25 */}
+      <div className="bg-white border border-slate-200 rounded-xl p-5 shadow-xs space-y-4">
+        <div className="flex items-center justify-between pb-2 border-b border-slate-100">
           <div className="flex items-center gap-2">
-            <Sliders className="w-4 h-4 text-teal-700" />
-            <span>View Detailed Economics & Scenario Assumptions</span>
+            <Building2 className="w-4 h-4 text-teal-700" />
+            <h3 className="text-sm font-bold text-slate-900">
+              Plant Capex Benchmarks (CEEW 2025 Exhibit 25)
+            </h3>
           </div>
-          <div className="flex items-center gap-1.5 text-slate-500 font-mono font-normal">
-            <span>{showDetailedEconomics ? 'Hide Assumptions' : 'Expand 7 Live Assumptions'}</span>
-            {showDetailedEconomics ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+          <span className="text-xs font-mono text-slate-500">Standard 3,600 tpa Plant</span>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-4 gap-3 text-xs">
+          <div className="p-3 bg-slate-50 rounded-lg border border-slate-200">
+            <span className="text-slate-500 text-[10px] block">Land Acquisition (1.5 acres)</span>
+            <span className="text-sm font-bold font-mono text-slate-900">₹4.75 Cr</span>
           </div>
-        </button>
-
-        {showDetailedEconomics && (
-          <div className="px-5 pb-5 pt-2 border-t border-slate-100 space-y-5">
-            {/* Plant Level Summary Numbers */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 p-3 bg-slate-50 rounded-lg border border-slate-200 text-xs font-mono tabular-nums">
-              <div>
-                <span className="text-slate-400 text-[10px]">Break-Even Feedstock Price:</span>
-                <div className="text-sm font-bold text-slate-900 mt-0.5">
-                  ₹{outputs.breakEvenFeedstockPricePerTonneINR.toLocaleString()}/t
-                </div>
-              </div>
-              <div>
-                <span className="text-slate-400 text-[10px]">Annual Plant EBITDA:</span>
-                <div className="text-sm font-bold text-teal-800 mt-0.5">
-                  ₹{outputs.annualPlantEBITDA_INR_Cr} Cr / year
-                </div>
-              </div>
-              <div>
-                <span className="text-slate-400 text-[10px]">Project IRR (10y Amort):</span>
-                <div className="text-sm font-bold text-slate-900 mt-0.5">
-                  {outputs.projectIRRPct}%
-                </div>
-              </div>
-            </div>
-
-            {/* Live Interactive Assumption Controls */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 text-xs">
-              {/* Silver Price */}
-              <div className="space-y-1">
-                <div className="flex justify-between">
-                  <span className="text-slate-600 font-medium">Silver Price (₹/kg):</span>
-                  <span className="font-mono font-bold text-slate-900">
-                    ₹{scenarioParams.silverPriceINR_per_kg.toLocaleString()}
-                  </span>
-                </div>
-                <input
-                  type="range"
-                  min="60000"
-                  max="120000"
-                  step="2000"
-                  value={scenarioParams.silverPriceINR_per_kg}
-                  onChange={(e) => updateScenarioParam('silverPriceINR_per_kg', Number(e.target.value))}
-                  className="w-full accent-teal-700 cursor-pointer"
-                />
-              </div>
-
-              {/* Aluminium Price */}
-              <div className="space-y-1">
-                <div className="flex justify-between">
-                  <span className="text-slate-600 font-medium">Aluminium Frame (₹/kg):</span>
-                  <span className="font-mono font-bold text-slate-900">
-                    ₹{scenarioParams.aluminiumPriceINR_per_kg}
-                  </span>
-                </div>
-                <input
-                  type="range"
-                  min="160"
-                  max="300"
-                  step="5"
-                  value={scenarioParams.aluminiumPriceINR_per_kg}
-                  onChange={(e) => updateScenarioParam('aluminiumPriceINR_per_kg', Number(e.target.value))}
-                  className="w-full accent-teal-700 cursor-pointer"
-                />
-              </div>
-
-              {/* Haul Distance */}
-              <div className="space-y-1">
-                <div className="flex justify-between">
-                  <span className="text-slate-600 font-medium">Haul Distance (km):</span>
-                  <span className="font-mono font-bold text-slate-900">
-                    {scenarioParams.avgTransportDistanceKm} km
-                  </span>
-                </div>
-                <input
-                  type="range"
-                  min="50"
-                  max="600"
-                  step="25"
-                  value={scenarioParams.avgTransportDistanceKm}
-                  onChange={(e) => updateScenarioParam('avgTransportDistanceKm', Number(e.target.value))}
-                  className="w-full accent-teal-700 cursor-pointer"
-                />
-              </div>
-
-              {/* EPR Fee Credit */}
-              <div className="space-y-1">
-                <div className="flex justify-between">
-                  <span className="text-slate-600 font-medium">EPR Credit (₹/t):</span>
-                  <span className="font-mono font-bold text-teal-800">
-                    ₹{scenarioParams.eprFeePerTonneINR.toLocaleString()}
-                  </span>
-                </div>
-                <input
-                  type="range"
-                  min="0"
-                  max="5000"
-                  step="200"
-                  value={scenarioParams.eprFeePerTonneINR}
-                  onChange={(e) => updateScenarioParam('eprFeePerTonneINR', Number(e.target.value))}
-                  className="w-full accent-teal-700 cursor-pointer"
-                />
-              </div>
-
-              {/* Feedstock Cost */}
-              <div className="space-y-1">
-                <div className="flex justify-between">
-                  <span className="text-slate-600 font-medium">Feedstock Cost (₹/t):</span>
-                  <span className="font-mono font-bold text-slate-900">
-                    ₹{scenarioParams.feedstockCostPerTonneINR.toLocaleString()}
-                  </span>
-                </div>
-                <input
-                  type="range"
-                  min="0"
-                  max="4000"
-                  step="100"
-                  value={scenarioParams.feedstockCostPerTonneINR}
-                  onChange={(e) => updateScenarioParam('feedstockCostPerTonneINR', Number(e.target.value))}
-                  className="w-full accent-teal-700 cursor-pointer"
-                />
-              </div>
-
-              {/* Technology Selection */}
-              <div className="space-y-1">
-                <span className="text-slate-600 font-medium block">Recycling Technology:</span>
-                <select
-                  value={scenarioParams.technologyPathway}
-                  onChange={(e) => updateScenarioParam('technologyPathway', e.target.value as any)}
-                  className="w-full p-1.5 border border-slate-300 rounded bg-slate-50 text-xs font-medium"
-                >
-                  <option value="mechanical">Mechanical Delamination (OPEX: ₹4,200/t)</option>
-                  <option value="thermal">Thermal Pyrolysis (OPEX: ₹7,800/t)</option>
-                  <option value="chemical">Hydrometallurgical (OPEX: ₹9,600/t)</option>
-                  <option value="hybrid">Hybrid Thermo-Mech (OPEX: ₹8,400/t)</option>
-                </select>
-              </div>
-
-              {/* Plant Scale */}
-              <div className="space-y-1">
-                <span className="text-slate-600 font-medium block">Facility Capacity:</span>
-                <select
-                  value={scenarioParams.plantCapacityTonnesYr}
-                  onChange={(e) => updateScenarioParam('plantCapacityTonnesYr', Number(e.target.value))}
-                  className="w-full p-1.5 border border-slate-300 rounded bg-slate-50 text-xs font-mono font-medium"
-                >
-                  <option value={10000}>10,000 t/yr (Pilot)</option>
-                  <option value={30000}>30,000 t/yr (Regional Hub)</option>
-                  <option value={60000}>60,000 t/yr (Mega Hub)</option>
-                </select>
-              </div>
-
-              {/* Reset Action */}
-              <div className="flex items-end">
-                <button
-                  type="button"
-                  onClick={resetScenarioParams}
-                  className="w-full py-2 px-3 border border-slate-300 rounded text-xs font-semibold text-slate-700 hover:bg-slate-50 flex items-center justify-center gap-1.5 cursor-pointer"
-                >
-                  <RotateCcw className="w-3.5 h-3.5" />
-                  <span>Reset All to Baseline</span>
-                </button>
-              </div>
-            </div>
+          <div className="p-3 bg-slate-50 rounded-lg border border-slate-200">
+            <span className="text-slate-500 text-[10px] block">Factory Construction</span>
+            <span className="text-sm font-bold font-mono text-slate-900">₹2.30 Cr</span>
           </div>
-        )}
+          <div className="p-3 bg-slate-50 rounded-lg border border-slate-200">
+            <span className="text-slate-500 text-[10px] block">Thermal/Hydromet Machinery</span>
+            <span className="text-sm font-bold font-mono text-slate-900">₹7.13 Cr</span>
+          </div>
+          <div className="p-3 bg-slate-50 rounded-lg border border-slate-200">
+            <span className="text-slate-500 text-[10px] block">TSDF / Environmental Compliance</span>
+            <span className="text-sm font-bold font-mono text-slate-900">₹0.20 Cr</span>
+          </div>
+        </div>
+
+        <div className="p-3 bg-teal-50/60 border border-teal-200 rounded-lg text-xs text-slate-700 leading-relaxed">
+          <strong>National Capital Scaling:</strong> Sizing standard 3,600 tpa plants nationally implies an aggregate capital requirement of <strong>₹4,274 Cr</strong> across 299 plants at peak 2040–2050 volumes. Indigenisation of delamination autoclaves and leaching tanks offers a potential ~43% capex reduction on the machinery component.
+        </div>
       </div>
     </div>
   );

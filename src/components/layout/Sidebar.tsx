@@ -3,21 +3,19 @@ import { useScenario } from '../../context/ScenarioContext';
 import { UserRole } from '../../types';
 import { 
   LayoutDashboard, 
-  Layers, 
   TrendingUp, 
-  Network, 
-  Atom, 
   Coins, 
-  Leaf, 
+  Atom, 
+  Network, 
   Truck, 
   FileText, 
-  Sliders, 
-  FileBarChart2, 
   Milestone,
-  HelpCircle,
+  Sliders, 
+  Layers, 
+  FileBarChart2,
   Building2,
-  ShieldAlert,
-  ChevronDown
+  HelpCircle,
+  ExternalLink
 } from 'lucide-react';
 
 interface SidebarProps {
@@ -35,102 +33,162 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentTab, onSelectTab }) => 
     setIsIntelligenceOpen
   } = useScenario();
 
-  const navItems = [
+  const primaryNav = [
     { id: 'overview', label: 'Overview', icon: LayoutDashboard },
-    { id: 'assets', label: 'Asset Intelligence', icon: Layers },
     { id: 'forecast', label: 'Waste Forecast', icon: TrendingUp },
-    { id: 'network', label: 'Network Planning', icon: Network },
-    { id: 'materials', label: 'Material Recovery', icon: Atom },
     { id: 'economics', label: 'Economics', icon: Coins },
-    { id: 'environment', label: 'Environmental Impact', icon: Leaf },
-    { id: 'logistics', label: 'Reverse Logistics', icon: Truck },
-    { id: 'policy', label: 'Policy & Compliance', icon: FileText },
-    { id: 'scenariolab', label: 'Scenario Lab', icon: Sliders },
-    { id: 'roadmap', label: 'Roadmap (2026–50)', icon: Milestone },
-    { id: 'reports', label: 'Reports & Export', icon: FileBarChart2 },
+    { id: 'materials', label: 'Material Recovery', icon: Atom },
   ];
 
-  const roleLabels: Record<UserRole, { title: string; org: string }> = {
-    manufacturer: { title: 'PV Manufacturer', org: 'INA Solar / Solar OEM' },
-    asset_owner: { title: 'Asset Owner / IPP', org: 'Utility Solar Portfolio' },
-    recycler: { title: 'Recycling Operator', org: 'Circular Hub Facility' },
-    epc_partner: { title: 'EPC & Channel', org: 'Regional Distribution' },
-    insurer: { title: 'Loss Underwriter', org: 'Claims & Salvage Desk' },
-    government: { title: 'Policy & Regulator', org: 'MNRE / CPCB Compliance' }
-  };
+  const secondaryNav = [
+    { id: 'network', label: 'Network Planning', icon: Network },
+    { id: 'logistics', label: 'Reverse Logistics', icon: Truck },
+    { id: 'policy', label: 'Policy & Compliance', icon: FileText },
+    { id: 'roadmap', label: 'Roadmap (2026–50)', icon: Milestone },
+  ];
+
+  const toolsNav = [
+    { id: 'scenariolab', label: 'Scenario Lab', icon: Sliders },
+    { id: 'assets', label: 'Asset Intelligence', icon: Layers },
+    { id: 'reports', label: 'Report Generator', icon: FileBarChart2 },
+  ];
 
   return (
-    <aside className="w-64 bg-[#0F172A] text-slate-300 flex flex-col justify-between shrink-0 h-screen sticky top-0 border-r border-slate-800 select-none z-30">
-      {/* Brand Zone */}
-      <div>
+    <aside className="w-64 bg-[#0F172A] text-slate-300 flex flex-col justify-between shrink-0 h-screen sticky top-0 border-r border-slate-800/90 select-none z-30">
+      {/* Brand & Persona Section */}
+      <div className="flex-1 overflow-y-auto">
         <div className="px-5 py-4 border-b border-slate-800/80 flex items-center justify-between">
           <div>
-            <div className="text-base font-bold tracking-tight text-white flex items-center gap-2">
+            <div className="text-sm font-bold tracking-tight text-white flex items-center gap-2">
               <span className="w-2.5 h-2.5 rounded-sm bg-teal-400"></span>
-              <span>SOLARLOOP</span>
+              <span className="font-mono tracking-wider">SOLARLOOP</span>
             </div>
             <div className="text-[10px] font-mono text-slate-400 uppercase tracking-widest mt-0.5">
-              Circularity Intelligence
+              Decarbonization Circularity
             </div>
           </div>
-          <span className="text-[10px] font-mono text-teal-400/80 border border-teal-500/30 px-1.5 py-0.5 rounded">
-            v2.4
+          <span className="text-[9px] font-mono text-teal-400 border border-teal-500/30 px-1.5 py-0.5 rounded bg-teal-950/40">
+            Tech Meet 13.0
           </span>
         </div>
 
-        {/* User Workspace Role Switcher */}
-        <div className="px-3 pt-3 pb-1">
-          <div className="bg-slate-800/60 border border-slate-700/60 rounded-lg p-2.5">
+        {/* User Role Switcher */}
+        <div className="px-3 pt-3 pb-2">
+          <div className="bg-slate-800/50 border border-slate-700/60 rounded-lg p-2.5">
             <div className="text-[10px] font-mono uppercase text-slate-400 tracking-wider mb-1 flex items-center justify-between">
-              <span>Active Persona</span>
+              <span>Decision Persona</span>
               <Building2 className="w-3 h-3 text-slate-400" />
             </div>
             <select
               value={userRole}
               onChange={(e) => setUserRole(e.target.value as UserRole)}
-              className="w-full bg-slate-900 text-xs text-white rounded border border-slate-700 px-2 py-1.5 focus:outline-none focus:ring-1 focus:ring-teal-500 cursor-pointer"
+              className="w-full bg-slate-900 text-xs text-slate-200 rounded border border-slate-700 px-2 py-1 focus:outline-none focus:ring-1 focus:ring-teal-500 cursor-pointer"
             >
               <option value="asset_owner">Solar Asset Owner / IPP</option>
               <option value="manufacturer">Solar Manufacturer (INA Mode)</option>
               <option value="recycler">Industrial Recycler</option>
               <option value="epc_partner">EPC & Channel Partner</option>
-              <option value="insurer">Insurer / Salvage Adjuster</option>
+              <option value="insurer">Insurer / Salvage Underwriter</option>
               <option value="government">Government / Policy Team</option>
             </select>
           </div>
         </div>
 
-        {/* Primary Navigation */}
-        <nav className="px-3 py-2 space-y-0.5 overflow-y-auto max-h-[calc(100vh-270px)]">
-          {navItems.map((item) => {
-            const Icon = item.icon;
-            const isActive = currentTab === item.id;
-            return (
-              <button
-                key={item.id}
-                type="button"
-                onClick={() => onSelectTab(item.id)}
-                className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-xs font-medium transition-colors text-left ${
-                  isActive
-                    ? 'bg-teal-600/15 text-teal-300 border border-teal-500/30 font-semibold'
-                    : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/50'
-                }`}
-              >
-                <Icon className={`w-4 h-4 shrink-0 ${isActive ? 'text-teal-400' : 'text-slate-500'}`} />
-                <span className="truncate">{item.label}</span>
-              </button>
-            );
-          })}
+        {/* Navigation Sections */}
+        <nav className="px-3 py-2 space-y-4">
+          {/* PRIMARY */}
+          <div>
+            <div className="px-3 pb-1 text-[10px] font-mono uppercase tracking-wider text-slate-400 font-semibold">
+              Primary Decisions
+            </div>
+            <div className="space-y-0.5">
+              {primaryNav.map((item) => {
+                const Icon = item.icon;
+                const isActive = currentTab === item.id;
+                return (
+                  <button
+                    key={item.id}
+                    type="button"
+                    onClick={() => onSelectTab(item.id)}
+                    className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-xs font-medium transition-all text-left cursor-pointer ${
+                      isActive
+                        ? 'bg-teal-500/15 text-teal-300 border border-teal-500/30 font-semibold'
+                        : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/50'
+                    }`}
+                  >
+                    <Icon className={`w-4 h-4 shrink-0 ${isActive ? 'text-teal-400' : 'text-slate-500'}`} />
+                    <span className="truncate">{item.label}</span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* SECONDARY */}
+          <div>
+            <div className="px-3 pb-1 text-[10px] font-mono uppercase tracking-wider text-slate-400 font-semibold">
+              Systems & Policy
+            </div>
+            <div className="space-y-0.5">
+              {secondaryNav.map((item) => {
+                const Icon = item.icon;
+                const isActive = currentTab === item.id;
+                return (
+                  <button
+                    key={item.id}
+                    type="button"
+                    onClick={() => onSelectTab(item.id)}
+                    className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-xs font-medium transition-all text-left cursor-pointer ${
+                      isActive
+                        ? 'bg-teal-500/15 text-teal-300 border border-teal-500/30 font-semibold'
+                        : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/50'
+                    }`}
+                  >
+                    <Icon className={`w-4 h-4 shrink-0 ${isActive ? 'text-teal-400' : 'text-slate-500'}`} />
+                    <span className="truncate">{item.label}</span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* TOOLS */}
+          <div>
+            <div className="px-3 pb-1 text-[10px] font-mono uppercase tracking-wider text-slate-400 font-semibold">
+              Analysis & Tools
+            </div>
+            <div className="space-y-0.5">
+              {toolsNav.map((item) => {
+                const Icon = item.icon;
+                const isActive = currentTab === item.id;
+                return (
+                  <button
+                    key={item.id}
+                    type="button"
+                    onClick={() => onSelectTab(item.id)}
+                    className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-xs font-medium transition-all text-left cursor-pointer ${
+                      isActive
+                        ? 'bg-teal-500/15 text-teal-300 border border-teal-500/30 font-semibold'
+                        : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/50'
+                    }`}
+                  >
+                    <Icon className={`w-4 h-4 shrink-0 ${isActive ? 'text-teal-400' : 'text-slate-500'}`} />
+                    <span className="truncate">{item.label}</span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
         </nav>
       </div>
 
-      {/* Bottom Auxiliary Controls */}
+      {/* Bottom Controls */}
       <div className="p-3 border-t border-slate-800/80 space-y-2">
-        {/* INA 700+ Partner Mode Quick Toggle */}
+        {/* INA Partner Mode Toggle */}
         <button
           type="button"
           onClick={() => setInaNetworkMode(!inaNetworkMode)}
-          className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-xs border transition-colors ${
+          className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-xs border transition-colors cursor-pointer ${
             inaNetworkMode
               ? 'bg-teal-950/80 text-teal-300 border-teal-700/60'
               : 'bg-slate-800/40 text-slate-400 border-slate-800 hover:text-slate-200'
@@ -138,24 +196,23 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentTab, onSelectTab }) => 
         >
           <div className="flex items-center gap-2">
             <span className={`w-2 h-2 rounded-full ${inaNetworkMode ? 'bg-teal-400' : 'bg-slate-600'}`}></span>
-            <span className="font-mono text-[11px]">INA Reverse Net</span>
+            <span className="font-mono text-[11px]">INA 700+ Nodes</span>
           </div>
-          <span className="text-[10px] text-slate-400 font-mono">700+ Nodes</span>
+          <span className="text-[10px] font-mono text-teal-400">{inaNetworkMode ? 'ON' : 'OFF'}</span>
         </button>
 
-        {/* Methodology Drawer Trigger */}
+        {/* Methodology link */}
         <button
           type="button"
           onClick={() => setIsMethodologyOpen(true)}
-          className="w-full flex items-center gap-2 px-3 py-1.5 rounded text-xs text-slate-400 hover:text-slate-200 hover:bg-slate-800/40 transition-colors"
+          className="w-full flex items-center justify-between px-3 py-1.5 rounded text-[11px] text-slate-400 hover:text-slate-200 hover:bg-slate-800/40 transition-colors cursor-pointer font-mono"
         >
-          <HelpCircle className="w-3.5 h-3.5 text-slate-400" />
-          <span className="text-[11px] font-sans">Methodology & Sources</span>
+          <span className="flex items-center gap-1.5">
+            <HelpCircle className="w-3.5 h-3.5" />
+            <span>Methodology Register</span>
+          </span>
+          <span className="text-teal-400 text-[10px]">CEEW / IRENA</span>
         </button>
-
-        <div className="text-[10px] text-slate-400 font-mono px-3 pt-1">
-          CEEW · MNRE · SolarLoop v2.4
-        </div>
       </div>
     </aside>
   );

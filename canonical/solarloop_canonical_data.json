@@ -1,0 +1,1357 @@
+{
+  "model_metadata": {
+    "system_name": "SolarLoop Canonical Analytical Platform",
+    "model_version": "2.0-SolarLoop",
+    "forecast_engine_version": "solar_waste_model_v2.py (FROZEN)",
+    "generated_at_utc": "2026-10-03T00:21:14.906281+00:00",
+    "status": "CANONICAL DATA LAYER",
+    "strategic_reference_document": "India_Solar_Circularity_10pg_Report.pdf",
+    "source_hierarchy": [
+      "1. Observed National Statistics (MNRE, CEA, CPCB)",
+      "2. Peer-Reviewed & Foundational Research (IRENA/IEA-PVPS 2016, CEEW 2024-2025)",
+      "3. Strategic Report Architecture (India_Solar_Circularity_10pg_Report.pdf)",
+      "4. Team Recomputations & Sensitivity Boundaries",
+      "5. Analytical Proposals (Clearly Tagged)"
+    ]
+  },
+  "forecast_outputs": {
+    "Conservative·Regular": {
+      "capacity_path": "Conservative",
+      "alpha": 5.3759,
+      "annual_series_kt": {
+        "2026": 61.36,
+        "2027": 42.88,
+        "2028": 44.34,
+        "2029": 46.39,
+        "2030": 49.24,
+        "2031": 53.13,
+        "2032": 58.35,
+        "2033": 65.26,
+        "2034": 74.28,
+        "2035": 85.89,
+        "2036": 100.59,
+        "2037": 118.98,
+        "2038": 141.65,
+        "2039": 169.22,
+        "2040": 202.28,
+        "2041": 241.39,
+        "2042": 287.04,
+        "2043": 339.58,
+        "2044": 399.25,
+        "2045": 466.07,
+        "2046": 539.87,
+        "2047": 620.22,
+        "2048": 706.43,
+        "2049": 797.56,
+        "2050": 892.36
+      },
+      "cumulative_series_kt": {
+        "2026": 213.83,
+        "2027": 256.72,
+        "2028": 301.05,
+        "2029": 347.45,
+        "2030": 396.69,
+        "2031": 449.82,
+        "2032": 508.17,
+        "2033": 573.43,
+        "2034": 647.72,
+        "2035": 733.6,
+        "2036": 834.2,
+        "2037": 953.18,
+        "2038": 1094.83,
+        "2039": 1264.05,
+        "2040": 1466.33,
+        "2041": 1707.72,
+        "2042": 1994.76,
+        "2043": 2334.34,
+        "2044": 2733.59,
+        "2045": 3199.66,
+        "2046": 3739.54,
+        "2047": 4359.76,
+        "2048": 5066.19,
+        "2049": 5863.75,
+        "2050": 6756.11
+      },
+      "commissioning_scrap_series_kt": {
+        "2026": 59.51,
+        "2027": 40.02,
+        "2028": 40.02,
+        "2029": 40.02,
+        "2030": 40.02,
+        "2031": 40.02,
+        "2032": 40.02,
+        "2033": 40.02,
+        "2034": 40.02,
+        "2035": 40.02,
+        "2036": 40.02,
+        "2037": 40.02,
+        "2038": 40.02,
+        "2039": 40.02,
+        "2040": 40.02,
+        "2041": 40.02,
+        "2042": 40.02,
+        "2043": 40.02,
+        "2044": 40.02,
+        "2045": 40.02,
+        "2046": 40.02,
+        "2047": 40.02,
+        "2048": 40.02,
+        "2049": 40.02,
+        "2050": 40.02
+      },
+      "operational_failure_series_kt": {
+        "2026": 1.85,
+        "2027": 2.86,
+        "2028": 4.32,
+        "2029": 6.37,
+        "2030": 9.22,
+        "2031": 13.11,
+        "2032": 18.33,
+        "2033": 25.24,
+        "2034": 34.26,
+        "2035": 45.87,
+        "2036": 60.57,
+        "2037": 78.96,
+        "2038": 101.63,
+        "2039": 129.2,
+        "2040": 162.26,
+        "2041": 201.37,
+        "2042": 247.02,
+        "2043": 299.56,
+        "2044": 359.23,
+        "2045": 426.05,
+        "2046": 499.85,
+        "2047": 580.2,
+        "2048": 666.41,
+        "2049": 757.54,
+        "2050": 852.34
+      },
+      "milestone_years": {
+        "2030": {
+          "annual_waste_kt": 49.24,
+          "cumulative_waste_kt": 396.69,
+          "commissioning_scrap_kt": 40.02,
+          "operational_failure_kt": 9.22
+        },
+        "2040": {
+          "annual_waste_kt": 202.28,
+          "cumulative_waste_kt": 1466.33,
+          "commissioning_scrap_kt": 40.02,
+          "operational_failure_kt": 162.26
+        },
+        "2050": {
+          "annual_waste_kt": 892.36,
+          "cumulative_waste_kt": 6756.11,
+          "commissioning_scrap_kt": 40.02,
+          "operational_failure_kt": 852.34
+        }
+      }
+    },
+    "Conservative·Early": {
+      "capacity_path": "Conservative",
+      "alpha": 2.4928,
+      "annual_series_kt": {
+        "2026": 90.56,
+        "2027": 80.58,
+        "2028": 92.87,
+        "2029": 108.02,
+        "2030": 126.16,
+        "2031": 147.38,
+        "2032": 171.75,
+        "2033": 199.3,
+        "2034": 230.01,
+        "2035": 263.83,
+        "2036": 300.67,
+        "2037": 340.4,
+        "2038": 382.85,
+        "2039": 427.82,
+        "2040": 475.09,
+        "2041": 524.4,
+        "2042": 575.48,
+        "2043": 628.01,
+        "2044": 681.7,
+        "2045": 736.21,
+        "2046": 791.21,
+        "2047": 846.38,
+        "2048": 901.39,
+        "2049": 955.91,
+        "2050": 1009.65
+      },
+      "cumulative_series_kt": {
+        "2026": 318.97,
+        "2027": 399.56,
+        "2028": 492.43,
+        "2029": 600.46,
+        "2030": 726.62,
+        "2031": 874.0,
+        "2032": 1045.75,
+        "2033": 1245.05,
+        "2034": 1475.06,
+        "2035": 1738.89,
+        "2036": 2039.57,
+        "2037": 2379.97,
+        "2038": 2762.81,
+        "2039": 3190.63,
+        "2040": 3665.72,
+        "2041": 4190.13,
+        "2042": 4765.6,
+        "2043": 5393.61,
+        "2044": 6075.31,
+        "2045": 6811.52,
+        "2046": 7602.73,
+        "2047": 8449.11,
+        "2048": 9350.5,
+        "2049": 10306.41,
+        "2050": 11316.06
+      },
+      "commissioning_scrap_series_kt": {
+        "2026": 59.51,
+        "2027": 40.02,
+        "2028": 40.02,
+        "2029": 40.02,
+        "2030": 40.02,
+        "2031": 40.02,
+        "2032": 40.02,
+        "2033": 40.02,
+        "2034": 40.02,
+        "2035": 40.02,
+        "2036": 40.02,
+        "2037": 40.02,
+        "2038": 40.02,
+        "2039": 40.02,
+        "2040": 40.02,
+        "2041": 40.02,
+        "2042": 40.02,
+        "2043": 40.02,
+        "2044": 40.02,
+        "2045": 40.02,
+        "2046": 40.02,
+        "2047": 40.02,
+        "2048": 40.02,
+        "2049": 40.02,
+        "2050": 40.02
+      },
+      "operational_failure_series_kt": {
+        "2026": 31.05,
+        "2027": 40.56,
+        "2028": 52.85,
+        "2029": 68.0,
+        "2030": 86.14,
+        "2031": 107.36,
+        "2032": 131.73,
+        "2033": 159.28,
+        "2034": 189.99,
+        "2035": 223.81,
+        "2036": 260.65,
+        "2037": 300.38,
+        "2038": 342.83,
+        "2039": 387.8,
+        "2040": 435.07,
+        "2041": 484.38,
+        "2042": 535.46,
+        "2043": 587.99,
+        "2044": 641.68,
+        "2045": 696.19,
+        "2046": 751.19,
+        "2047": 806.36,
+        "2048": 861.37,
+        "2049": 915.89,
+        "2050": 969.63
+      },
+      "milestone_years": {
+        "2030": {
+          "annual_waste_kt": 126.16,
+          "cumulative_waste_kt": 726.62,
+          "commissioning_scrap_kt": 40.02,
+          "operational_failure_kt": 86.14
+        },
+        "2040": {
+          "annual_waste_kt": 475.09,
+          "cumulative_waste_kt": 3665.72,
+          "commissioning_scrap_kt": 40.02,
+          "operational_failure_kt": 435.07
+        },
+        "2050": {
+          "annual_waste_kt": 1009.65,
+          "cumulative_waste_kt": 11316.06,
+          "commissioning_scrap_kt": 40.02,
+          "operational_failure_kt": 969.63
+        }
+      }
+    },
+    "Base·Regular": {
+      "capacity_path": "Base",
+      "alpha": 5.3759,
+      "annual_series_kt": {
+        "2026": 61.36,
+        "2027": 69.56,
+        "2028": 71.02,
+        "2029": 73.07,
+        "2030": 75.93,
+        "2031": 93.17,
+        "2032": 98.45,
+        "2033": 105.48,
+        "2034": 114.76,
+        "2035": 126.85,
+        "2036": 142.4,
+        "2037": 162.18,
+        "2038": 187.04,
+        "2039": 217.9,
+        "2040": 255.75,
+        "2041": 301.63,
+        "2042": 356.59,
+        "2043": 421.66,
+        "2044": 497.8,
+        "2045": 585.88,
+        "2046": 686.58,
+        "2047": 800.39,
+        "2048": 927.49,
+        "2049": 1067.73,
+        "2050": 1220.53
+      },
+      "cumulative_series_kt": {
+        "2026": 213.83,
+        "2027": 283.4,
+        "2028": 354.41,
+        "2029": 427.49,
+        "2030": 503.42,
+        "2031": 596.59,
+        "2032": 695.03,
+        "2033": 800.51,
+        "2034": 915.28,
+        "2035": 1042.12,
+        "2036": 1184.52,
+        "2037": 1346.71,
+        "2038": 1533.74,
+        "2039": 1751.64,
+        "2040": 2007.39,
+        "2041": 2309.02,
+        "2042": 2665.62,
+        "2043": 3087.28,
+        "2044": 3585.08,
+        "2045": 4170.96,
+        "2046": 4857.54,
+        "2047": 5657.93,
+        "2048": 6585.42,
+        "2049": 7653.15,
+        "2050": 8873.68
+      },
+      "commissioning_scrap_series_kt": {
+        "2026": 59.51,
+        "2027": 66.7,
+        "2028": 66.7,
+        "2029": 66.7,
+        "2030": 66.7,
+        "2031": 80.04,
+        "2032": 80.04,
+        "2033": 80.04,
+        "2034": 80.04,
+        "2035": 80.04,
+        "2036": 80.04,
+        "2037": 80.04,
+        "2038": 80.04,
+        "2039": 80.04,
+        "2040": 80.04,
+        "2041": 80.04,
+        "2042": 80.04,
+        "2043": 80.04,
+        "2044": 80.04,
+        "2045": 80.04,
+        "2046": 80.04,
+        "2047": 80.04,
+        "2048": 80.04,
+        "2049": 80.04,
+        "2050": 80.04
+      },
+      "operational_failure_series_kt": {
+        "2026": 1.85,
+        "2027": 2.86,
+        "2028": 4.32,
+        "2029": 6.37,
+        "2030": 9.23,
+        "2031": 13.13,
+        "2032": 18.41,
+        "2033": 25.44,
+        "2034": 34.72,
+        "2035": 46.81,
+        "2036": 62.36,
+        "2037": 82.14,
+        "2038": 107.0,
+        "2039": 137.86,
+        "2040": 175.71,
+        "2041": 221.59,
+        "2042": 276.55,
+        "2043": 341.62,
+        "2044": 417.76,
+        "2045": 505.84,
+        "2046": 606.54,
+        "2047": 720.35,
+        "2048": 847.45,
+        "2049": 987.69,
+        "2050": 1140.49
+      },
+      "milestone_years": {
+        "2030": {
+          "annual_waste_kt": 75.93,
+          "cumulative_waste_kt": 503.42,
+          "commissioning_scrap_kt": 66.7,
+          "operational_failure_kt": 9.23
+        },
+        "2040": {
+          "annual_waste_kt": 255.75,
+          "cumulative_waste_kt": 2007.39,
+          "commissioning_scrap_kt": 80.04,
+          "operational_failure_kt": 175.71
+        },
+        "2050": {
+          "annual_waste_kt": 1220.53,
+          "cumulative_waste_kt": 8873.68,
+          "commissioning_scrap_kt": 80.04,
+          "operational_failure_kt": 1140.49
+        }
+      }
+    },
+    "Base·Early": {
+      "capacity_path": "Base",
+      "alpha": 2.4928,
+      "annual_series_kt": {
+        "2026": 90.56,
+        "2027": 107.26,
+        "2028": 119.79,
+        "2029": 136.03,
+        "2030": 156.48,
+        "2031": 194.84,
+        "2032": 224.83,
+        "2033": 260.31,
+        "2034": 301.57,
+        "2035": 348.82,
+        "2036": 402.14,
+        "2037": 461.54,
+        "2038": 526.95,
+        "2039": 598.22,
+        "2040": 675.12,
+        "2041": 757.36,
+        "2042": 844.58,
+        "2043": 936.36,
+        "2044": 1032.22,
+        "2045": 1131.63,
+        "2046": 1234.05,
+        "2047": 1338.87,
+        "2048": 1445.48,
+        "2049": 1553.25,
+        "2050": 1661.55
+      },
+      "cumulative_series_kt": {
+        "2026": 318.97,
+        "2027": 426.24,
+        "2028": 546.03,
+        "2029": 682.06,
+        "2030": 838.53,
+        "2031": 1033.37,
+        "2032": 1258.21,
+        "2033": 1518.52,
+        "2034": 1820.09,
+        "2035": 2168.91,
+        "2036": 2571.05,
+        "2037": 3032.59,
+        "2038": 3559.55,
+        "2039": 4157.77,
+        "2040": 4832.89,
+        "2041": 5590.26,
+        "2042": 6434.84,
+        "2043": 7371.2,
+        "2044": 8403.41,
+        "2045": 9535.05,
+        "2046": 10769.09,
+        "2047": 12107.96,
+        "2048": 13553.45,
+        "2049": 15106.7,
+        "2050": 16768.25
+      },
+      "commissioning_scrap_series_kt": {
+        "2026": 59.51,
+        "2027": 66.7,
+        "2028": 66.7,
+        "2029": 66.7,
+        "2030": 66.7,
+        "2031": 80.04,
+        "2032": 80.04,
+        "2033": 80.04,
+        "2034": 80.04,
+        "2035": 80.04,
+        "2036": 80.04,
+        "2037": 80.04,
+        "2038": 80.04,
+        "2039": 80.04,
+        "2040": 80.04,
+        "2041": 80.04,
+        "2042": 80.04,
+        "2043": 80.04,
+        "2044": 80.04,
+        "2045": 80.04,
+        "2046": 80.04,
+        "2047": 80.04,
+        "2048": 80.04,
+        "2049": 80.04,
+        "2050": 80.04
+      },
+      "operational_failure_series_kt": {
+        "2026": 31.05,
+        "2027": 40.56,
+        "2028": 53.09,
+        "2029": 69.33,
+        "2030": 89.78,
+        "2031": 114.8,
+        "2032": 144.79,
+        "2033": 180.27,
+        "2034": 221.53,
+        "2035": 268.78,
+        "2036": 322.1,
+        "2037": 381.5,
+        "2038": 446.91,
+        "2039": 518.18,
+        "2040": 595.08,
+        "2041": 677.32,
+        "2042": 764.54,
+        "2043": 856.32,
+        "2044": 952.18,
+        "2045": 1051.59,
+        "2046": 1154.01,
+        "2047": 1258.83,
+        "2048": 1365.44,
+        "2049": 1473.21,
+        "2050": 1581.51
+      },
+      "milestone_years": {
+        "2030": {
+          "annual_waste_kt": 156.48,
+          "cumulative_waste_kt": 838.53,
+          "commissioning_scrap_kt": 66.7,
+          "operational_failure_kt": 89.78
+        },
+        "2040": {
+          "annual_waste_kt": 675.12,
+          "cumulative_waste_kt": 4832.89,
+          "commissioning_scrap_kt": 80.04,
+          "operational_failure_kt": 595.08
+        },
+        "2050": {
+          "annual_waste_kt": 1661.55,
+          "cumulative_waste_kt": 16768.25,
+          "commissioning_scrap_kt": 80.04,
+          "operational_failure_kt": 1581.51
+        }
+      }
+    },
+    "High·Regular": {
+      "capacity_path": "High",
+      "alpha": 5.3759,
+      "annual_series_kt": {
+        "2026": 61.36,
+        "2027": 82.9,
+        "2028": 84.36,
+        "2029": 86.41,
+        "2030": 89.27,
+        "2031": 119.86,
+        "2032": 125.16,
+        "2033": 132.26,
+        "2034": 141.67,
+        "2035": 154.0,
+        "2036": 169.99,
+        "2037": 190.5,
+        "2038": 216.52,
+        "2039": 249.14,
+        "2040": 289.59,
+        "2041": 339.19,
+        "2042": 399.33,
+        "2043": 471.42,
+        "2044": 556.9,
+        "2045": 657.12,
+        "2046": 773.35,
+        "2047": 906.63,
+        "2048": 1057.75,
+        "2049": 1227.1,
+        "2050": 1414.59
+      },
+      "cumulative_series_kt": {
+        "2026": 213.83,
+        "2027": 296.74,
+        "2028": 381.09,
+        "2029": 467.51,
+        "2030": 556.78,
+        "2031": 676.64,
+        "2032": 801.8,
+        "2033": 934.07,
+        "2034": 1075.73,
+        "2035": 1229.74,
+        "2036": 1399.73,
+        "2037": 1590.23,
+        "2038": 1806.75,
+        "2039": 2055.89,
+        "2040": 2345.48,
+        "2041": 2684.67,
+        "2042": 3084.0,
+        "2043": 3555.42,
+        "2044": 4112.31,
+        "2045": 4769.43,
+        "2046": 5542.78,
+        "2047": 6449.41,
+        "2048": 7507.16,
+        "2049": 8734.27,
+        "2050": 10148.85
+      },
+      "commissioning_scrap_series_kt": {
+        "2026": 59.51,
+        "2027": 80.04,
+        "2028": 80.04,
+        "2029": 80.04,
+        "2030": 80.04,
+        "2031": 106.72,
+        "2032": 106.72,
+        "2033": 106.72,
+        "2034": 106.72,
+        "2035": 106.72,
+        "2036": 106.72,
+        "2037": 106.72,
+        "2038": 106.72,
+        "2039": 106.72,
+        "2040": 106.72,
+        "2041": 106.72,
+        "2042": 106.72,
+        "2043": 106.72,
+        "2044": 106.72,
+        "2045": 106.72,
+        "2046": 106.72,
+        "2047": 106.72,
+        "2048": 106.72,
+        "2049": 106.72,
+        "2050": 106.72
+      },
+      "operational_failure_series_kt": {
+        "2026": 1.85,
+        "2027": 2.86,
+        "2028": 4.32,
+        "2029": 6.37,
+        "2030": 9.23,
+        "2031": 13.14,
+        "2032": 18.44,
+        "2033": 25.54,
+        "2034": 34.95,
+        "2035": 47.28,
+        "2036": 63.27,
+        "2037": 83.78,
+        "2038": 109.8,
+        "2039": 142.42,
+        "2040": 182.87,
+        "2041": 232.47,
+        "2042": 292.61,
+        "2043": 364.7,
+        "2044": 450.18,
+        "2045": 550.4,
+        "2046": 666.63,
+        "2047": 799.91,
+        "2048": 951.03,
+        "2049": 1120.38,
+        "2050": 1307.87
+      },
+      "milestone_years": {
+        "2030": {
+          "annual_waste_kt": 89.27,
+          "cumulative_waste_kt": 556.78,
+          "commissioning_scrap_kt": 80.04,
+          "operational_failure_kt": 9.23
+        },
+        "2040": {
+          "annual_waste_kt": 289.59,
+          "cumulative_waste_kt": 2345.48,
+          "commissioning_scrap_kt": 106.72,
+          "operational_failure_kt": 182.87
+        },
+        "2050": {
+          "annual_waste_kt": 1414.59,
+          "cumulative_waste_kt": 10148.85,
+          "commissioning_scrap_kt": 106.72,
+          "operational_failure_kt": 1307.87
+        }
+      }
+    },
+    "High·Early": {
+      "capacity_path": "High",
+      "alpha": 2.4928,
+      "annual_series_kt": {
+        "2026": 90.56,
+        "2027": 120.6,
+        "2028": 133.25,
+        "2029": 150.03,
+        "2030": 171.64,
+        "2031": 225.24,
+        "2032": 258.1,
+        "2033": 297.81,
+        "2034": 344.93,
+        "2035": 399.84,
+        "2036": 462.78,
+        "2037": 533.86,
+        "2038": 613.11,
+        "2039": 700.4,
+        "2040": 795.55,
+        "2041": 898.26,
+        "2042": 1008.11,
+        "2043": 1124.64,
+        "2044": 1247.28,
+        "2045": 1375.38,
+        "2046": 1508.26,
+        "2047": 1645.15,
+        "2048": 1785.26,
+        "2049": 1927.76,
+        "2050": 2071.82
+      },
+      "cumulative_series_kt": {
+        "2026": 318.97,
+        "2027": 439.58,
+        "2028": 572.83,
+        "2029": 722.86,
+        "2030": 894.49,
+        "2031": 1119.73,
+        "2032": 1377.84,
+        "2033": 1675.65,
+        "2034": 2020.59,
+        "2035": 2420.43,
+        "2036": 2883.21,
+        "2037": 3417.07,
+        "2038": 4030.18,
+        "2039": 4730.58,
+        "2040": 5526.14,
+        "2041": 6424.39,
+        "2042": 7432.51,
+        "2043": 8557.15,
+        "2044": 9804.42,
+        "2045": 11179.8,
+        "2046": 12688.06,
+        "2047": 14333.21,
+        "2048": 16118.46,
+        "2049": 18046.23,
+        "2050": 20118.04
+      },
+      "commissioning_scrap_series_kt": {
+        "2026": 59.51,
+        "2027": 80.04,
+        "2028": 80.04,
+        "2029": 80.04,
+        "2030": 80.04,
+        "2031": 106.72,
+        "2032": 106.72,
+        "2033": 106.72,
+        "2034": 106.72,
+        "2035": 106.72,
+        "2036": 106.72,
+        "2037": 106.72,
+        "2038": 106.72,
+        "2039": 106.72,
+        "2040": 106.72,
+        "2041": 106.72,
+        "2042": 106.72,
+        "2043": 106.72,
+        "2044": 106.72,
+        "2045": 106.72,
+        "2046": 106.72,
+        "2047": 106.72,
+        "2048": 106.72,
+        "2049": 106.72,
+        "2050": 106.72
+      },
+      "operational_failure_series_kt": {
+        "2026": 31.05,
+        "2027": 40.56,
+        "2028": 53.21,
+        "2029": 69.99,
+        "2030": 91.6,
+        "2031": 118.52,
+        "2032": 151.38,
+        "2033": 191.09,
+        "2034": 238.21,
+        "2035": 293.12,
+        "2036": 356.06,
+        "2037": 427.14,
+        "2038": 506.39,
+        "2039": 593.68,
+        "2040": 688.83,
+        "2041": 791.54,
+        "2042": 901.39,
+        "2043": 1017.92,
+        "2044": 1140.56,
+        "2045": 1268.66,
+        "2046": 1401.54,
+        "2047": 1538.43,
+        "2048": 1678.54,
+        "2049": 1821.04,
+        "2050": 1965.1
+      },
+      "milestone_years": {
+        "2030": {
+          "annual_waste_kt": 171.64,
+          "cumulative_waste_kt": 894.49,
+          "commissioning_scrap_kt": 80.04,
+          "operational_failure_kt": 91.6
+        },
+        "2040": {
+          "annual_waste_kt": 795.55,
+          "cumulative_waste_kt": 5526.14,
+          "commissioning_scrap_kt": 106.72,
+          "operational_failure_kt": 688.83
+        },
+        "2050": {
+          "annual_waste_kt": 2071.82,
+          "cumulative_waste_kt": 20118.04,
+          "commissioning_scrap_kt": 106.72,
+          "operational_failure_kt": 1965.1
+        }
+      }
+    }
+  },
+  "sensitivity_outputs": {
+    "2030": {
+      "baseline_cumulative_kt": 503.41608330910015,
+      "cases": [
+        {
+          "parameter": "Loss curve (Regular -> Early)",
+          "type": "One-sided scenario switch",
+          "bounds": "alpha: 5.3759 -> 2.4928",
+          "low_kt": 503.41608330910015,
+          "high_kt": 838.5345209180207,
+          "range_kt": 335.11843760892054,
+          "pct_swing_vs_base": 66.56887785668064
+        },
+        {
+          "parameter": "Capacity trajectory (Conservative <-> High)",
+          "type": "Two-sided parametric",
+          "bounds": "path: Conservative (30 GW) <-> High (60-80 GW)",
+          "low_kt": 396.69076178893255,
+          "high_kt": 556.778744069184,
+          "range_kt": 160.08798228025142,
+          "pct_swing_vs_base": 31.800331294134786
+        },
+        {
+          "parameter": "DC/AC ratio basis (1.00 -> 1.25)",
+          "type": "One-sided reporting sensitivity",
+          "bounds": "DC/AC: 1.00 (DC nameplate) -> 1.25 (AC with oversizing)",
+          "low_kt": 503.41608330910015,
+          "high_kt": 629.2701041363752,
+          "range_kt": 125.85402082727501,
+          "pct_swing_vs_base": 24.999999999999993
+        },
+        {
+          "parameter": "Commissioning loss rate (1.0% <-> 4.0%)",
+          "type": "Two-sided parametric",
+          "bounds": "handling loss: 1.0% <-> 4.0% (baseline: 2.3%)",
+          "low_kt": 234.74661461208717,
+          "high_kt": 854.7530808359633,
+          "range_kt": 620.006466223876,
+          "pct_swing_vs_base": 123.15984466534987
+        },
+        {
+          "parameter": "Module mass intensity, post-2022 (50 <-> 65 t/MW)",
+          "type": "Two-sided parametric",
+          "bounds": "t/MW: 50.0 <-> 65.0 (baseline: 58.0)",
+          "low_kt": 448.8209329610146,
+          "high_kt": 551.186839863675,
+          "range_kt": 102.36590690266041,
+          "pct_swing_vs_base": 20.334254366642316
+        },
+        {
+          "parameter": "Weibull scale beta (33 yr <-> 27 yr)",
+          "type": "Two-sided parametric (inverted: longer life = lower waste)",
+          "bounds": "beta: 33 yr (low waste) <-> 27 yr (high waste)",
+          "low_kt": 492.5127333022079,
+          "high_kt": 523.7980343437911,
+          "range_kt": 31.285301041583182,
+          "pct_swing_vs_base": 6.2146010186913
+        }
+      ]
+    },
+    "2040": {
+      "baseline_cumulative_kt": 2007.391264582074,
+      "cases": [
+        {
+          "parameter": "Loss curve (Regular -> Early)",
+          "type": "One-sided scenario switch",
+          "bounds": "alpha: 5.3759 -> 2.4928",
+          "low_kt": 2007.391264582074,
+          "high_kt": 4832.891678109269,
+          "range_kt": 2825.5004135271956,
+          "pct_swing_vs_base": 140.754842535167
+        },
+        {
+          "parameter": "Capacity trajectory (Conservative <-> High)",
+          "type": "Two-sided parametric",
+          "bounds": "path: Conservative (30 GW) <-> High (60-80 GW)",
+          "low_kt": 1466.3306795782487,
+          "high_kt": 2345.479849592881,
+          "range_kt": 879.1491700146321,
+          "pct_swing_vs_base": 43.795606044826805
+        },
+        {
+          "parameter": "DC/AC ratio basis (1.00 -> 1.25)",
+          "type": "One-sided reporting sensitivity",
+          "bounds": "DC/AC: 1.00 (DC nameplate) -> 1.25 (AC with oversizing)",
+          "low_kt": 2007.391264582074,
+          "high_kt": 2509.2390807275924,
+          "range_kt": 501.84781614551844,
+          "pct_swing_vs_base": 24.999999999999996
+        },
+        {
+          "parameter": "Commissioning loss rate (1.0% <-> 4.0%)",
+          "type": "Two-sided parametric",
+          "bounds": "handling loss: 1.0% <-> 4.0% (baseline: 2.3%)",
+          "low_kt": 1295.6835946123372,
+          "high_kt": 2938.0859099271147,
+          "range_kt": 1642.4023153147775,
+          "pct_swing_vs_base": 81.81774745625961
+        },
+        {
+          "parameter": "Module mass intensity, post-2022 (50 <-> 65 t/MW)",
+          "type": "Two-sided parametric",
+          "bounds": "t/MW: 50.0 <-> 65.0 (baseline: 58.0)",
+          "low_kt": 1812.3361745515067,
+          "high_kt": 2178.0644683588202,
+          "range_kt": 365.72829380731355,
+          "pct_swing_vs_base": 18.21908365649164
+        },
+        {
+          "parameter": "Weibull scale beta (33 yr <-> 27 yr)",
+          "type": "Two-sided parametric (inverted: longer life = lower waste)",
+          "bounds": "beta: 33 yr (low waste) <-> 27 yr (high waste)",
+          "low_kt": 1730.4723928137173,
+          "high_kt": 2485.6776520116673,
+          "range_kt": 755.20525919795,
+          "pct_swing_vs_base": 37.621228732166415
+        }
+      ]
+    },
+    "2050": {
+      "baseline_cumulative_kt": 8873.681968905312,
+      "cases": [
+        {
+          "parameter": "Loss curve (Regular -> Early)",
+          "type": "One-sided scenario switch",
+          "bounds": "alpha: 5.3759 -> 2.4928",
+          "low_kt": 8873.681968905312,
+          "high_kt": 16768.24676238288,
+          "range_kt": 7894.56479347757,
+          "pct_swing_vs_base": 88.96605514082302
+        },
+        {
+          "parameter": "Capacity trajectory (Conservative <-> High)",
+          "type": "Two-sided parametric",
+          "bounds": "path: Conservative (30 GW) <-> High (60-80 GW)",
+          "low_kt": 6756.107344488086,
+          "high_kt": 10148.851935061672,
+          "range_kt": 3392.744590573586,
+          "pct_swing_vs_base": 38.23378618325812
+        },
+        {
+          "parameter": "DC/AC ratio basis (1.00 -> 1.25)",
+          "type": "One-sided reporting sensitivity",
+          "bounds": "DC/AC: 1.00 (DC nameplate) -> 1.25 (AC with oversizing)",
+          "low_kt": 8873.681968905312,
+          "high_kt": 11092.10246113164,
+          "range_kt": 2218.420492226329,
+          "pct_swing_vs_base": 25.00000000000001
+        },
+        {
+          "parameter": "Commissioning loss rate (1.0% <-> 4.0%)",
+          "type": "Two-sided parametric",
+          "bounds": "handling loss: 1.0% <-> 4.0% (baseline: 2.3%)",
+          "low_kt": 7790.287276577543,
+          "high_kt": 10290.428874257012,
+          "range_kt": 2500.1415976794688,
+          "pct_swing_vs_base": 28.174793805326054
+        },
+        {
+          "parameter": "Module mass intensity, post-2022 (50 <-> 65 t/MW)",
+          "type": "Two-sided parametric",
+          "bounds": "t/MW: 50.0 <-> 65.0 (baseline: 58.0)",
+          "low_kt": 7979.440524134732,
+          "high_kt": 9656.143233079569,
+          "range_kt": 1676.7027089448366,
+          "pct_swing_vs_base": 18.89523103059417
+        },
+        {
+          "parameter": "Weibull scale beta (33 yr <-> 27 yr)",
+          "type": "Two-sided parametric (inverted: longer life = lower waste)",
+          "bounds": "beta: 33 yr (low waste) <-> 27 yr (high waste)",
+          "low_kt": 6614.878199750979,
+          "high_kt": 12253.481839744927,
+          "range_kt": 5638.6036399939485,
+          "pct_swing_vs_base": 63.54299894623726
+        }
+      ]
+    }
+  },
+  "material_model": {
+    "canonical_baseline_cSi": {
+      "Glass": {
+        "mass_fraction": 0.742,
+        "kg_per_tonne": 742.0,
+        "source": "CEEW (2025) / Report Exhibit 23",
+        "status": "DOCUMENTED SOURCE",
+        "notes": "741.6 kg/t in report Exhibit 23; front glass of standard c-Si module."
+      },
+      "Polymer": {
+        "mass_fraction": 0.113,
+        "kg_per_tonne": 113.0,
+        "source": "CEEW (2025) / Report Exhibit 23",
+        "status": "DOCUMENTED SOURCE",
+        "notes": "113.1 kg/t in report Exhibit 23; EVA encapsulants and Tedlar/PET backsheet."
+      },
+      "Aluminium": {
+        "mass_fraction": 0.103,
+        "kg_per_tonne": 103.0,
+        "source": "CEEW (2025) / Report Exhibit 23",
+        "status": "DOCUMENTED SOURCE",
+        "notes": "103.0 kg/t; extruded frame and mounting clips."
+      },
+      "Silicon": {
+        "mass_fraction": 0.0335,
+        "kg_per_tonne": 33.5,
+        "source": "CEEW (2025) / Report Exhibit 23",
+        "status": "DOCUMENTED SOURCE",
+        "notes": "33.5 kg/t; crystalline silicon solar cells."
+      },
+      "Copper": {
+        "mass_fraction": 0.0057,
+        "kg_per_tonne": 5.7,
+        "source": "CEEW (2025) / Report Exhibit 23",
+        "status": "DOCUMENTED SOURCE",
+        "notes": "5.7 kg/t; tinned ribbon, bussing, junction box wiring."
+      },
+      "Silver": {
+        "mass_fraction": 6e-05,
+        "kg_per_tonne": 0.06,
+        "source": "CEEW (2025) / Report Exhibit 10 & 23",
+        "status": "DOCUMENTED SOURCE",
+        "notes": "60 g/t (~0.006% of mass); ~25% of gross recovery value at ₹240/g."
+      },
+      "Other": {
+        "mass_fraction": 0.00274,
+        "kg_per_tonne": 2.74,
+        "source": "Report Exhibit 23 mass balance closure",
+        "status": "MODELLING ASSUMPTION",
+        "notes": "3.0 kg/t in report (Pb solder, Sn, junction box resins, cables)."
+      }
+    },
+    "technology_silver_profiles": {
+      "Legacy_cSi": {
+        "description": "Historical c-Si fleet (pre-2022)",
+        "silver_g_per_tonne": 60.0,
+        "silver_mg_per_watt": null,
+        "assumed_watts_per_tonne": 18000.0,
+        "source": "CEEW (2025) / Report Exhibit 10",
+        "status": "DOCUMENTED SOURCE"
+      },
+      "TOPCon_Class_Low": {
+        "description": "Modern n-type TOPCon cell architecture (lower silver bound)",
+        "silver_g_per_tonne": 367.2,
+        "silver_mg_per_watt": 20.4,
+        "assumed_watts_per_tonne": 18000.0,
+        "source": "Report Exhibit 10 & 11 (20.4 mg/W TOPCon-class)",
+        "status": "DOCUMENTED SOURCE"
+      },
+      "TOPCon_Class_High": {
+        "description": "Modern n-type TOPCon cell architecture (upper silver bound)",
+        "silver_g_per_tonne": 468.0,
+        "silver_mg_per_watt": 26.0,
+        "assumed_watts_per_tonne": 18000.0,
+        "source": "Report Exhibit 10 & 11 (26.0 mg/W TOPCon-class)",
+        "status": "DOCUMENTED SOURCE"
+      }
+    },
+    "disposition_accounting": {
+      "equation": "input_mass = recovered_material_mass + co_processed_mass + residual_mass",
+      "category_1": "Recovered Material (Materially recovered and refined for economic offtake)",
+      "category_2": "Co-Processing (Energy and mineral recovery in cement kilns; NOT material recovery)",
+      "category_3": "Residual / Authorised Disposal (Process losses, glass fines, TSDF hazardous waste)"
+    }
+  },
+  "recycling_routes": {
+    "Chemical": {
+      "name": "Thermal Delamination + Hydrometallurgical Chemical Recovery",
+      "report_cost_inr_per_tonne": 49100.0,
+      "trl": "6-8",
+      "description": "Acid/alkali leaching and electrowinning for high-purity metal extraction.",
+      "material_recovery_yields": {
+        "Aluminium": 0.99,
+        "Glass": 0.89,
+        "Silicon": 0.9,
+        "Copper": 0.83,
+        "Silver": 0.74,
+        "Polymer": 0.0,
+        "Other": 0.0
+      },
+      "co_processing_yields": {
+        "Aluminium": 0.0,
+        "Glass": 0.0,
+        "Silicon": 0.0,
+        "Copper": 0.0,
+        "Silver": 0.0,
+        "Polymer": 1.0,
+        "Other": 0.0
+      },
+      "disposition_categories": {
+        "recovered_material": "Materials extracted and processed back into economic supply chains (cullet, aluminium remelt, MG-Si, cathode copper, refined silver).",
+        "co_processing": "Thermal recovery where polymer/EVA is co-processed in cement kilns for energy and mineral ash utilization (113 kg/t).",
+        "residual_disposal": "Process losses, unrecovered glass fines, and hazardous elements (lead, tin, fluoride effluent) sent to authorized TSDF facilities (~90 kg/t)."
+      },
+      "offtake_grade_notes": {
+        "Aluminium": "High-purity frame remelt; qualified for extrusion.",
+        "Glass": "Cullet suitable for container/insulation glass; solar float glass requires purity verification.",
+        "Silicon": "Metallurgical-grade (MG-Si); upgrade to solar-grade requires 3N refining (C-MET/CSIR).",
+        "Copper": "Refinery grade cathode.",
+        "Silver": "Liquid precious-metal refiner offtake (>99% purity).",
+        "Polymer": "No material recycling; co-processing in cement kilns.",
+        "Other": "Sent to authorized TSDF hazardous waste facilities."
+      },
+      "source": "CEEW (2025) / Report Exhibit 15 & 23",
+      "status": "DOCUMENTED SOURCE"
+    },
+    "Mechanical": {
+      "name": "Mechanical Shredding, Optical Sorting & Magnetic/Eddy-Current Separation",
+      "report_cost_inr_per_tonne": 40100.0,
+      "trl": "9",
+      "description": "Mature physical separation producing bulk cullet, aluminium, and impure fractions.",
+      "material_recovery_yields": {
+        "Aluminium": 0.99,
+        "Glass": 0.89,
+        "Silicon": 0.95,
+        "Copper": 0.95,
+        "Silver": 0.0,
+        "Polymer": 0.0,
+        "Other": 0.0
+      },
+      "co_processing_yields": {
+        "Aluminium": 0.0,
+        "Glass": 0.0,
+        "Silicon": 0.0,
+        "Copper": 0.0,
+        "Silver": 0.0,
+        "Polymer": 0.0,
+        "Other": 0.0
+      },
+      "disposition_categories": {
+        "recovered_material": "Aluminium frame (99%), Glass fines (89%), Ferrosilicon (95%), Impure Copper shred (95%). Zero silver recovery.",
+        "co_processing": "0 kg (not cleanly delaminated from glass/cells; unseparated).",
+        "residual_disposal": "Mixed shred dust, unrecovered glass fines, polymers, solders (~200 kg/t)."
+      },
+      "offtake_grade_notes": {
+        "Aluminium": "Clean extruded aluminium scrap.",
+        "Glass": "Downcycled into aggregate / civil construction fines.",
+        "Silicon": "Low-value ferrosilicon additive.",
+        "Copper": "Impure shred requiring further smelting.",
+        "Silver": "Zero recovery; economically lost.",
+        "Polymer": "Landfill or refuse-derived fuel (RDF).",
+        "Other": "Mixed shred residual."
+      },
+      "source": "CEEW (2025) / Report Exhibit 15",
+      "status": "DOCUMENTED SOURCE"
+    }
+  },
+  "stream_routing": {
+    "Early_Loss_Salvage": {
+      "timing_and_size": "Current; ~60 kt in 2026 (2.3% of additions); site-based bulk at utility parks.",
+      "technology_vintage": "Recent (PERC -> TOPCon): silver-rich (20.4-26 mg/W).",
+      "recommended_route": "Hybrid: mechanical dismantling -> thermal delamination -> hydromet Ag/Cu/Si recovery at regional hub.",
+      "economic_rationale": "Silver value alone is ₹65-83k/t; concentrated at utility sites; highest value feedstock.",
+      "status": "PROPOSAL",
+      "attractiveness": "5/5 (Priority 1)"
+    },
+    "Insurance_Salvage": {
+      "timing_and_size": "Current; weather/transit damage; volumes unquantified (evidence gap).",
+      "technology_vintage": "Recent (PERC -> TOPCon).",
+      "recommended_route": "Consolidated via EPC/insurers directly to hybrid regional hub.",
+      "economic_rationale": "High silver concentration; bulk truckloads.",
+      "status": "PROPOSAL (REQUIRES VALIDATION OF VOLUMES)",
+      "attractiveness": "5/5 (Priority 1)"
+    },
+    "Utility_Decommissioning_Legacy": {
+      "timing_and_size": "From early 2030s; bulk single-site loads.",
+      "technology_vintage": "Legacy c-Si (~60 g/t silver).",
+      "recommended_route": "Mechanical near-site: extract aluminium frame and glass; route cell laminates to hub only if volume justifies.",
+      "economic_rationale": "Low silver content (~₹10.7k/t at ₹240/g); lowest haul cost per tonne; net negative without policy.",
+      "status": "PROPOSAL",
+      "attractiveness": "4/5 (Priority 2)"
+    },
+    "Dispersed_Rooftop_PM_KUSUM": {
+      "timing_and_size": "Mostly 2035-2050; 36% of current additions; highly fragmented across rural/urban nodes.",
+      "technology_vintage": "Mixed vintages.",
+      "recommended_route": "District spokes: strip frame, J-box, glass locally; compact laminates trucked to regional hub.",
+      "economic_rationale": "Published net -₹10k to -₹12k/t; haul distance (360 km) destroys margins; requires EPR aggregator support.",
+      "status": "PROPOSAL",
+      "attractiveness": "2/5 today; 4/5 with EPR"
+    },
+    "CdTe_Thin_Film": {
+      "timing_and_size": "Smaller legacy fleet (~8% of historical waste, e.g. First Solar projects in Rajasthan/Gujarat).",
+      "technology_vintage": "Cadmium Telluride.",
+      "recommended_route": "Dedicated closed-loop producer take-back (First Solar established recycling facility).",
+      "economic_rationale": "Controlled hazardous route for Cadmium/Tellurium (>90% material recovery claim).",
+      "status": "DOCUMENTED PRODUCER ROUTE",
+      "attractiveness": "Treat separately"
+    },
+    "Future_Generations_2045": {
+      "timing_and_size": "Post-2045 wave.",
+      "technology_vintage": "Tandem / Perovskite / Glass-Glass / Lead-free.",
+      "recommended_route": "Advanced chemical / supercritical fluid / design-for-recycling lines.",
+      "economic_rationale": "Requires pilot validation in 2035.",
+      "status": "EVIDENCE GAP",
+      "attractiveness": "Design lever now"
+    }
+  },
+  "logistics_network": {
+    "architecture": "Hub-and-Spoke Regional Network",
+    "status": "PROPOSAL",
+    "key_nodes": {
+      "district_spokes": {
+        "function": "Receive, triage (reuse vs recycle), de-frame, remove J-box, glass separation (Stages 1-3).",
+        "footprint": "Candidate co-location with existing aggregator yards and INA channel partners.",
+        "transport_saving": "Strips ~74% glass and 10% aluminium locally, drastically cutting heavy road freight."
+      },
+      "regional_hubs": {
+        "function": "Thermal delamination, chemical hydrometallurgy, precious metal refining, TSDF compliance (Stages 4-6).",
+        "candidate_clusters": [
+          "Rajasthan (Jaipur / RIICO industrial park)",
+          "Gujarat (Surat - Bharuch corridor)",
+          "Maharashtra (Pune - Nagpur belt)",
+          "Karnataka (Bengaluru - Tumakuru)",
+          "Tamil Nadu / Andhra Pradesh (Chennai - Sri City)"
+        ],
+        "target_utilization": ">= 67% (minimum economic threshold per CEEW 2025)"
+      }
+    },
+    "haul_distance_parameters": {
+      "baseline_average_haul_km": 360.0,
+      "freight_rate_inr_per_tonne_km": 12.0,
+      "baseline_collection_cost_inr_per_tonne": 4454.0,
+      "optimized_spoke_haul_km": 100.0,
+      "logistics_saving_inr_per_tonne": 3217.0,
+      "source": "CEEW (2025) / Report Exhibit 19 & 21"
+    }
+  },
+  "ina_strategic_context": {
+    "entity_name": "Insolation Energy Limited (INA Solar)",
+    "status": "STRATEGIC OPTION / PROPOSAL (NOT AN EXISTING CONTRACT)",
+    "verified_company_facts": {
+      "channel_network": "700+ channel partners across 100+ districts (Problem Statement / Report p. 7).",
+      "manufacturing_hub": "Jaipur, Rajasthan (Rajasthan represents ~35% of India's utility additions).",
+      "planned_aluminium_frame_capacity": "12,000 t/year frame manufacturing line planned (status unverified).",
+      "cell_manufacturing_plans": "Planned TOPCon and 1,500 MW cell manufacturing line.",
+      "installed_supply_footprint": ">700 MW supplied under JJM, SECI, PM-KUSUM, PM Surya Ghar."
+    },
+    "strategic_anchoring_opportunities": {
+      "aggregation_spokes": "Utilize 700+ channel partner yards as district-level drop-off and triage nodes.",
+      "aluminium_circularity": {
+        "feasibility": "National recoverable aluminium is ~5-16 kt/yr in 2030 and ~9-36 kt/yr in 2035.",
+        "implication": "INA's planned 12 kt/yr frame line could absorb a meaningful share of recycled aluminium without oversupply risk.",
+        "prerequisite": "Alloy qualification, remelt certification, and operational line confirmation."
+      },
+      "closed_loop_take_back": "Traceable take-back mechanism for INA-branded modules under PM Surya Ghar / KUSUM.",
+      "design_for_recycling": "Incorporate recyclability standards into upcoming 1,500 MW cell/module lines."
+    }
+  },
+  "economics_reference": {
+    "Published_CEEW_Chemical": {
+      "label": "Published CEEW Reference Case (Chemical Route)",
+      "net_inr_per_tonne": -12341.0,
+      "classification": "PUBLISHED BENCHMARK",
+      "notes": "Silver at ₹95.8/g, paid feedstock ₹600/module, no EPR support."
+    },
+    "Silver_Repriced_Team_Case": {
+      "label": "Silver Re-Priced Team Case (Chemical Route)",
+      "net_inr_per_tonne": -5938.0,
+      "classification": "TEAM RECOMPUTATION",
+      "notes": "Silver repriced to ₹240/g (30 Sep 2026 quote); adds +₹6,403/t; no policy support."
+    },
+    "EPR_Floor_Bankable_Case": {
+      "label": "Hypothetical EPR Floor Case (Chemical Route)",
+      "net_inr_per_tonne": 16062.0,
+      "classification": "HYPOTHETICAL POLICY SCENARIO",
+      "notes": "Silver at ₹240/g + EPR certificate floor of ₹22/kg (+₹22,000/t). NOT CURRENT MARKET REALITY."
+    },
+    "Published_CEEW_Mechanical": {
+      "label": "Published CEEW Reference Case (Mechanical Route)",
+      "net_inr_per_tonne": -10200.0,
+      "classification": "PUBLISHED BENCHMARK",
+      "notes": "Lower capex/opex (₹40.1k/t), but zero silver recovery leaves net economics negative."
+    }
+  },
+  "policy_matrix": [
+    {
+      "mechanism": "Solar EPR Targets and Certificates",
+      "current_state": "E-Waste Rules 2022 classify solar PV under category CEEW14, but no recycling targets or tradable certificates are notified.",
+      "proposed_intervention": "Notify mandatory recycling targets (40% collection / 80% recycling by 2030) and establish EPR credit floor of ₹22/kg (ceiling ₹74/kg).",
+      "economic_effect": "+₹22,000/tonne revenue; flips chemical recycling from -₹5.9k/t to +₹16.0k/t.",
+      "responsible_institution": "MoEFCC / CPCB",
+      "status": "PROPOSED (EVIDENCE GAP IN GAZETTE TIMING)"
+    },
+    {
+      "mechanism": "Bulk-Consumer Channelling Duty",
+      "current_state": "Solar park developers and IPPs have no statutory duty to channel end-of-life modules to formal recyclers.",
+      "proposed_intervention": "Mandate that solar power developers (>1 MW) declare decommissioning schedules and surrender modules to registered recyclers at zero cost.",
+      "economic_effect": "Feedstock certainty; eliminates ₹600/module procurement cost (+₹27,300/t saving for recyclers).",
+      "responsible_institution": "MoEFCC / MNRE / SECI tender clauses",
+      "status": "PROPOSED"
+    },
+    {
+      "mechanism": "Material-Specific Recovery Mandates",
+      "current_state": "General e-waste targets allow cherry-picking aluminium and steel, abandoning cells and glass.",
+      "proposed_intervention": "Notify material-specific recovery thresholds (e.g. 70% Ag, 80% Cu, 80% Si) to enforce deep recycling.",
+      "economic_effect": "Protects ~₹10.7k/t silver value from being landfilled or lost in mechanical shredding.",
+      "responsible_institution": "MoEFCC / CPCB",
+      "status": "PROPOSED"
+    },
+    {
+      "mechanism": "National Installed-Asset Registry",
+      "current_state": "MNRE mandates RFID tags, and NISE manages the ALMM portal, but data is fragmented and not accessible for waste planning.",
+      "proposed_intervention": "Extend ALMM/RFID traceability into a public district-level digital registry tracking location, vintage, and technology.",
+      "economic_effect": "Optimizes hub siting and vehicle routing, cutting average haul from 360 km to 100 km (saves ₹3,217/t).",
+      "responsible_institution": "MNRE / NISE",
+      "status": "PROPOSED"
+    },
+    {
+      "mechanism": "Pre-Funded End-of-Life Disposal Fee",
+      "current_state": "No advance disposal fee collected at commissioning.",
+      "proposed_intervention": "Levy an upfront escrow fee of ₹0.3-0.5/W on new installations to fund eventual decommissioning.",
+      "economic_effect": "Guarantees long-term solvency of recycling funds without recurring state subsidy.",
+      "responsible_institution": "MNRE / MoEFCC",
+      "status": "PROPOSED"
+    }
+  ],
+  "digital_stack": {
+    "architecture": "Layered Traceability & Logistics Protocol",
+    "blockchain_status": "EXCLUDED (no multi-party trust failure that a cryptographically signed registry cannot solve)",
+    "layers": [
+      {
+        "layer": "Physical Identity",
+        "technology": "RFID tags (already mandated in scheme projects) + 2D QR codes on frame and backsheet.",
+        "function": "Module serialization, manufacturer ID, bill of materials, warranty registration."
+      },
+      {
+        "layer": "Asset Registry",
+        "technology": "Central database extending NISE ALMM traceability portal to district levels.",
+        "function": "Tracks plant coordinates, commissioning date, module technology, and expected retirement."
+      },
+      {
+        "layer": "Predictive Triage",
+        "technology": "Survival model + SCADA degradation algorithms + drone EL/thermography.",
+        "function": "Predicts field failure and gates modules between second-life reuse and material recycling."
+      },
+      {
+        "layer": "Logistics & Routing",
+        "technology": "Vehicle routing API connected to district spoke consolidation hubs.",
+        "function": "Minimizes transport mileage and enables reverse-logistics backhauls."
+      },
+      {
+        "layer": "Compliance & EPR Ledger",
+        "technology": "CPCB EPR portal API with cryptographic chain-of-custody handoffs.",
+        "function": "Validates mass balance and issues tamper-proof EPR recycling certificates."
+      }
+    ]
+  }
+}

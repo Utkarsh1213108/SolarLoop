@@ -11,11 +11,12 @@ export type UserRole =
   | 'government';       // Policy Maker / MNRE / CPCB
 
 export type ForecastScenarioId = 
-  | 'base_regular'
-  | 'base_early_loss'
   | 'conservative_regular'
   | 'conservative_early_loss'
-  | 'custom_scenario';
+  | 'base_regular'
+  | 'base_early_loss'
+  | 'high_regular'
+  | 'high_early_loss';
 
 export type WasteStreamType = 
   | 'scheduled_eol'
@@ -336,4 +337,129 @@ export interface EnvironmentalImpactMetrics {
   rawSandSavedKt: number;
   bauxiteSavedKt: number;
   hazardousHeavyMetalsSafelyHandledTonnes: number;
+}
+
+export interface CanonicalMilestone {
+  annual_waste_kt: number;
+  cumulative_waste_kt: number;
+  commissioning_scrap_kt: number;
+  operational_failure_kt: number;
+}
+
+export interface CanonicalScenarioOutput {
+  capacity_path: string;
+  alpha: number;
+  annual_series_kt: Record<string, number>;
+  cumulative_series_kt: Record<string, number>;
+  commissioning_scrap_series_kt: Record<string, number>;
+  operational_failure_series_kt: Record<string, number>;
+  milestone_years: {
+    '2030': CanonicalMilestone;
+    '2040': CanonicalMilestone;
+    '2050': CanonicalMilestone;
+  };
+}
+
+export interface CanonicalMaterialItem {
+  mass_fraction: number;
+  kg_per_tonne: number;
+  source: string;
+  status: string;
+  notes: string;
+}
+
+export interface CanonicalRecyclingRoute {
+  name: string;
+  report_cost_inr_per_tonne: number;
+  trl: string;
+  description: string;
+  material_recovery_yields: Record<string, number>;
+  co_processing_yields: Record<string, number>;
+  disposition_categories: {
+    recovered_material: string;
+    co_processing: string;
+    residual_disposal: string;
+  };
+  offtake_grade_notes: Record<string, string>;
+  source: string;
+  status: string;
+}
+
+export interface CanonicalData {
+  model_metadata: {
+    system_name: string;
+    model_version: string;
+    forecast_engine_version: string;
+    generated_at_utc: string;
+    status: string;
+    strategic_reference_document: string;
+    source_hierarchy: string[];
+  };
+  forecast_outputs: Record<string, CanonicalScenarioOutput>;
+  sensitivity_outputs: Record<string, {
+    baseline_cumulative_kt: number;
+    cases: Array<{
+      parameter: string;
+      type: string;
+      bounds: string;
+      low_kt: number;
+      high_kt: number;
+      range_kt: number;
+      pct_swing_vs_base: number;
+    }>;
+  }>;
+  material_model: {
+    canonical_baseline_cSi: Record<string, CanonicalMaterialItem>;
+    technology_silver_profiles: Record<string, any>;
+    disposition_accounting: {
+      equation: string;
+      category_1: string;
+      category_2: string;
+      category_3: string;
+    };
+  };
+  recycling_routes: Record<string, CanonicalRecyclingRoute>;
+  stream_routing: Record<string, any>;
+  logistics_network: {
+    architecture: string;
+    status: string;
+    key_nodes: Record<string, any>;
+    haul_distance_parameters: {
+      baseline_average_haul_km: number;
+      freight_rate_inr_per_tonne_km: number;
+      baseline_collection_cost_inr_per_tonne: number;
+      optimized_spoke_haul_km: number;
+      logistics_saving_inr_per_tonne: number;
+      source: string;
+    };
+  };
+  ina_strategic_context: {
+    entity_name: string;
+    status: string;
+    verified_company_facts: Record<string, string>;
+    strategic_anchoring_opportunities: Record<string, any>;
+  };
+  economics_reference: Record<string, {
+    label: string;
+    net_inr_per_tonne: number;
+    classification: string;
+    notes: string;
+  }>;
+  policy_matrix: Array<{
+    mechanism: string;
+    current_state: string;
+    proposed_intervention: string;
+    economic_effect: string;
+    responsible_institution: string;
+    status: string;
+  }>;
+  digital_stack: {
+    architecture: string;
+    blockchain_status: string;
+    layers: Array<{
+      layer: string;
+      technology: string;
+      function: string;
+    }>;
+  };
 }

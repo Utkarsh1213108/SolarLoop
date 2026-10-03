@@ -1,5 +1,5 @@
 {
-  "name": "react-example",
+  "name": "solarloop",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -9,7 +9,8 @@
     "start": "tsx server.ts",
     "preview": "vite preview",
     "clean": "rm -rf dist server.js",
-    "lint": "tsc --noEmit"
+    "lint": "tsc --noEmit",
+    "test": "tsx -e \"import { run_all_integrity_tests } from './src/models/coreCalculations.test.ts'; const r = run_all_integrity_tests(); if (!r.allPassed) { console.error('Tests failed', r); process.exit(1); } else { console.log('All 15 integrity tests passed successfully'); }\""
   },
   "dependencies": {
     "@google/genai": "^2.4.0",

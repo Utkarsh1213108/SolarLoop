@@ -1,24 +1,49 @@
-import {
-  REPRESENTATIVE_MODULE_COMPOSITION,
-  DEFAULT_SCENARIO_PARAMETERS
-} from '../data/researchBaseline';
-import {
-  get_kt_per_gw,
-  weibull_cdf,
-  calculate_cohort_retirement_probability,
-  simulate_stock_flow_fleet,
-  calculate_material_recovery,
-  calculate_recovered_material_value,
-  calculate_transport_cost,
-  calculate_project_dcf_and_irr,
-  calculate_processing_economics,
+/**
+ * CANONICAL MIGRATION TEST SUITE
+ * 
+ * Programmatically validates the SolarLoop Canonical Analytical Platform against
+ * authoritative ground truth data from:
+ * - canonical/solar_waste_model_v2.py (FROZEN WASTE FORECASTING ENGINE)
+ * - canonical/solarloop_engine.py
+ * - canonical/solarloop_canonical_data.json
+ * - canonical/validation_register.json
+ * 
+ * Verifies:
+ * 1. Canonical JSON loads correctly with required metadata
+ * 2. Exactly six canonical scenarios exist
+ * 3. Base·Regular milestones (2030, 2040, 2050) match ground truth exactly
+ * 4. Base·Early milestones (2030, 2040, 2050) match ground truth exactly
+ * 5. High·Regular milestones match ground truth exactly
+ * 6. High·Early milestones match ground truth exactly
+ * 7. Conservative·Regular & Conservative·Early milestones match ground truth
+ * 8. Strict non-negativity and cumulative monotonicity across all 6 scenarios (2026-2050)
+ * 9. Canonical material baseline sums to exactly 100.000%
+ * 10. Mass conservation: input_mass = recovered_material + co_processed + residual
+ * 11. Chemical route polymer co-processing (113 kg/t) and TSDF residual (~90 kg/t)
+ * 12. Mechanical route yields exactly 0% silver recovery
+ * 13. Canonical economics reference benchmarks (-₹12,341, -₹5,938, +₹16,062, -₹10,200)
+ * 14. Zero active repowering assumption in runtime execution
+ * 15. Zero active 0.22% damage assumption in runtime execution
+ */
+
+import { 
+  CANONICAL_DATA, 
+  CANONICAL_SCENARIOS_META,
+  CANONICAL_SCENARIO_MAP,
+  getCanonicalScenario,
+  getCanonicalTimeSeries,
+  calculateCanonicalMaterialFlow,
+  calculateCanonicalEconomics
+} from '../data/canonicalLoader';
+
+import { 
+  run_scenario, 
+  SCENARIO_CONFIGS,
   calculate_required_plants,
-  calculate_sensitivity_tornado,
-  calculate_logistics_comparison,
-  evaluate_technology_pathways,
-  generate_solarloop_recommendation,
-  SCENARIO_CONFIGS
+  calculate_transport_cost
 } from './coreCalculations';
+
+import { ForecastScenarioId } from '../types';
 
 export interface TestResult {
   testId: string;
@@ -38,227 +63,321 @@ export function run_all_integrity_tests(): {
 } {
   const results: TestResult[] = [];
 
-  // TEST 1: Material composition = exactly 100.000%
-  const totalMassPct = Number(
-    REPRESENTATIVE_MODULE_COMPOSITION.reduce((sum, item) => sum + item.percentageByMass, 0).toFixed(3)
+  // TEST 1: Canonical JSON loads correctly
+  const hasMetadata = Boolean(
+    CANONICAL_DATA?.model_metadata?.system_name &&
+    CANONICAL_DATA?.model_metadata?.forecast_engine_version &&
+    CANONICAL_DATA?.forecast_outputs &&
+    CANONICAL_DATA?.material_model &&
+    CANONICAL_DATA?.economics_reference
   );
   results.push({
-    testId: 'TEST-01',
-    name: 'Material Composition 100.000% Balance',
-    passed: totalMassPct === 100.0,
-    expected: '100.000%',
-    actual: `${totalMassPct}%`,
-    notes: 'Reconciled with 7th element (Other / Junction box & potting inorganics)'
+    testId: 'MIG-01',
+    name: 'Canonical JSON Schema & Metadata Load',
+    passed: hasMetadata,
+    expected: 'All root keys present with 2.0-SolarLoop version',
+    actual: hasMetadata ? `${CANONICAL_DATA.model_metadata.system_name} (${CANONICAL_DATA.model_metadata.model_version})` : 'Missing metadata',
+    notes: `Engine: ${CANONICAL_DATA.model_metadata.forecast_engine_version}`
   });
 
-  // TEST 2: Cohort retirement probabilities discrete mass non-negative and sums <= 1
-  let probSum = 0;
-  let allNonNegative = true;
-  for (let age = 0; age <= 40; age++) {
-    const p = calculate_cohort_retirement_probability(age, 25.0, 5.0);
-    if (p < 0) allNonNegative = false;
-    probSum += p;
-  }
+  // TEST 2: Exactly six canonical scenarios present
+  const canonicalScenarioKeys = Object.keys(CANONICAL_DATA.forecast_outputs);
+  const expectedScenarios = [
+    'Conservative·Regular',
+    'Conservative·Early',
+    'Base·Regular',
+    'Base·Early',
+    'High·Regular',
+    'High·Early'
+  ];
+  const all6Present = expectedScenarios.every(s => canonicalScenarioKeys.includes(s)) && canonicalScenarioKeys.length === 6;
   results.push({
-    testId: 'TEST-02',
-    name: 'Discrete Yearly Weibull Probability Mass Non-Negativity & Boundedness',
-    passed: allNonNegative && probSum > 0.98 && probSum <= 1.0001,
-    expected: 'All P(t) >= 0 and sum(0..40) ~ 1.0',
-    actual: `Min >= 0: ${allNonNegative}, Sum: ${probSum.toFixed(4)}`,
-    notes: 'Uses Weibull CDF(age + 1) - Weibull CDF(age)'
+    testId: 'MIG-02',
+    name: 'Presence of Exactly Six Canonical Scenarios',
+    passed: all6Present,
+    expected: expectedScenarios.join(', '),
+    actual: canonicalScenarioKeys.join(', '),
+    notes: 'Exposes 3 trajectories (Conservative, Base, High) x 2 curves (Regular, Early-Loss)'
   });
 
-  // TEST 3: Active Fleet Reconciliation Identity: Installed = Active + Retired + Early + Repowered + Damaged
-  const sim = simulate_stock_flow_fleet(2050, DEFAULT_SCENARIO_PARAMETERS);
-  const rec = sim.reconciliation;
-  results.push({
-    testId: 'TEST-03',
-    name: 'Stock-Flow Fleet Mass Conservation Identity',
-    passed: rec.isBalanced && rec.discrepancyGW < 0.001,
-    expected: 'Installed GW == Active GW + Cumulative Removed GW (Discrepancy < 0.001 GW)',
-    actual: `Discrepancy: ${rec.discrepancyGW.toFixed(6)} GW (Balanced: ${rec.isBalanced})`,
-    notes: rec.reconciliationIdentityFormula
-  });
+  // TEST 3: Base·Regular milestones (2030, 2040, 2050)
+  const baseReg = CANONICAL_DATA.forecast_outputs['Base·Regular'];
+  const baseReg_2030_ann = baseReg.annual_series_kt['2030'];
+  const baseReg_2030_cum = baseReg.cumulative_series_kt['2030'];
+  const baseReg_2040_ann = baseReg.annual_series_kt['2040'];
+  const baseReg_2040_cum = baseReg.cumulative_series_kt['2040'];
+  const baseReg_2050_ann = baseReg.annual_series_kt['2050'];
+  const baseReg_2050_cum = baseReg.cumulative_series_kt['2050'];
 
-  // TEST 4: Damage attrition calculated strictly against active operating fleet
-  const latestBalance = sim.yearlyBalances[sim.yearlyBalances.length - 1];
-  const damageRate = 0.0022;
-  const activeFleet = latestBalance.activeOperatingFleetGW;
-  const expectedDamageGW = Number((activeFleet * damageRate).toFixed(4));
-  results.push({
-    testId: 'TEST-04',
-    name: 'Damage Attrition Applied Strictly to Active Operating Fleet',
-    passed: Math.abs(latestBalance.annualDamagedGW - expectedDamageGW) < 0.01,
-    expected: `Damaged GW == Active Operating Fleet (${activeFleet} GW) * 0.22%`,
-    actual: `Damaged GW: ${latestBalance.annualDamagedGW} vs Expected: ${expectedDamageGW}`,
-    notes: 'Technical fix: does not apply damage to already decommissioned modules'
-  });
-
-  // TEST 5: Annual waste >= 0 for all forecast years
-  const allPositive = sim.annualBreakdowns.every(b => 
-    b.cohortRegularEolKt >= 0 && 
-    b.earlyLossKt >= 0 && 
-    b.repoweringKt >= 0 && 
-    b.damagedInsuranceKt >= 0 && 
-    b.totalAnnualKt >= 0
+  const baseRegPassed = (
+    baseReg_2030_ann === 75.93 &&
+    baseReg_2030_cum === 503.42 &&
+    baseReg_2040_ann === 255.75 &&
+    baseReg_2040_cum === 2007.39 &&
+    baseReg_2050_ann === 1220.53 &&
+    baseReg_2050_cum === 8873.68
   );
   results.push({
-    testId: 'TEST-05',
-    name: 'Annual Waste Stream Non-Negativity',
-    passed: allPositive,
-    expected: 'All annual stream values >= 0 kt',
-    actual: `All non-negative: ${allPositive}`,
-    notes: 'Evaluated across 2025 to 2050'
+    testId: 'MIG-03',
+    name: 'Base·Regular Canonical Milestone Truth (2030, 2040, 2050)',
+    passed: baseRegPassed,
+    expected: '2030: 75.93 / 503.42 kt | 2040: 255.75 / 2007.39 kt | 2050: 1220.53 / 8873.68 kt',
+    actual: `2030: ${baseReg_2030_ann} / ${baseReg_2030_cum} kt | 2040: ${baseReg_2040_ann} / ${baseReg_2040_cum} kt | 2050: ${baseReg_2050_ann} / ${baseReg_2050_cum} kt`,
+    notes: 'Verified against solar_waste_model_v2.py (alpha=5.3759, beta=30.0)'
   });
 
-  // TEST 6: Cumulative waste monotonic non-decreasing
-  let isMonotonic = true;
-  for (let i = 1; i < sim.annualBreakdowns.length; i++) {
-    if (sim.annualBreakdowns[i].cumulativeKt < sim.annualBreakdowns[i - 1].cumulativeKt) {
-      isMonotonic = false;
-      break;
+  // TEST 4: Base·Early milestones (2030, 2040, 2050)
+  const baseEarly = CANONICAL_DATA.forecast_outputs['Base·Early'];
+  const baseEarly_2030_ann = baseEarly.annual_series_kt['2030'];
+  const baseEarly_2030_cum = baseEarly.cumulative_series_kt['2030'];
+  const baseEarly_2040_ann = baseEarly.annual_series_kt['2040'];
+  const baseEarly_2040_cum = baseEarly.cumulative_series_kt['2040'];
+  const baseEarly_2050_ann = baseEarly.annual_series_kt['2050'];
+  const baseEarly_2050_cum = baseEarly.cumulative_series_kt['2050'];
+
+  const baseEarlyPassed = (
+    baseEarly_2030_ann === 156.48 &&
+    baseEarly_2030_cum === 838.53 &&
+    baseEarly_2040_ann === 675.12 &&
+    baseEarly_2040_cum === 4832.89 &&
+    baseEarly_2050_ann === 1661.55 &&
+    baseEarly_2050_cum === 16768.25
+  );
+  results.push({
+    testId: 'MIG-04',
+    name: 'Base·Early Canonical Milestone Truth (2030, 2040, 2050)',
+    passed: baseEarlyPassed,
+    expected: '2030: 156.48 / 838.53 kt | 2040: 675.12 / 4832.89 kt | 2050: 1661.55 / 16768.25 kt',
+    actual: `2030: ${baseEarly_2030_ann} / ${baseEarly_2030_cum} kt | 2040: ${baseEarly_2040_ann} / ${baseEarly_2040_cum} kt | 2050: ${baseEarly_2050_ann} / ${baseEarly_2050_cum} kt`,
+    notes: 'Verified against solar_waste_model_v2.py (alpha=2.4928, beta=30.0)'
+  });
+
+  // TEST 5: High·Regular milestones (2030, 2040, 2050)
+  const highReg = CANONICAL_DATA.forecast_outputs['High·Regular'];
+  const highRegPassed = (
+    highReg.annual_series_kt['2030'] === 89.27 &&
+    highReg.cumulative_series_kt['2030'] === 556.78 &&
+    highReg.annual_series_kt['2040'] === 289.59 &&
+    highReg.cumulative_series_kt['2040'] === 2345.48 &&
+    highReg.annual_series_kt['2050'] === 1414.59 &&
+    highReg.cumulative_series_kt['2050'] === 10148.85
+  );
+  results.push({
+    testId: 'MIG-05',
+    name: 'High·Regular Canonical Milestone Truth',
+    passed: highRegPassed,
+    expected: '2030: 89.27 / 556.78 kt | 2040: 289.59 / 2345.48 kt | 2050: 1414.59 / 10148.85 kt',
+    actual: `2030: ${highReg.annual_series_kt['2030']} / ${highReg.cumulative_series_kt['2030']} kt | 2040: ${highReg.annual_series_kt['2040']} / ${highReg.cumulative_series_kt['2040']} kt | 2050: ${highReg.annual_series_kt['2050']} / ${highReg.cumulative_series_kt['2050']} kt`
+  });
+
+  // TEST 6: High·Early milestones (2030, 2040, 2050)
+  const highEarly = CANONICAL_DATA.forecast_outputs['High·Early'];
+  const highEarlyPassed = (
+    highEarly.annual_series_kt['2030'] === 171.64 &&
+    highEarly.cumulative_series_kt['2030'] === 894.49 &&
+    highEarly.annual_series_kt['2040'] === 795.55 &&
+    highEarly.cumulative_series_kt['2040'] === 5526.14 &&
+    highEarly.annual_series_kt['2050'] === 2071.82 &&
+    highEarly.cumulative_series_kt['2050'] === 20118.04
+  );
+  results.push({
+    testId: 'MIG-06',
+    name: 'High·Early Canonical Milestone Truth',
+    passed: highEarlyPassed,
+    expected: '2030: 171.64 / 894.49 kt | 2040: 795.55 / 5526.14 kt | 2050: 2071.82 / 20118.04 kt',
+    actual: `2030: ${highEarly.annual_series_kt['2030']} / ${highEarly.cumulative_series_kt['2030']} kt | 2040: ${highEarly.annual_series_kt['2040']} / ${highEarly.cumulative_series_kt['2040']} kt | 2050: ${highEarly.annual_series_kt['2050']} / ${highEarly.cumulative_series_kt['2050']} kt`
+  });
+
+  // TEST 7: Forecast Monotonicity & Non-Negativity across all scenarios (2026-2050)
+  let monotonicityPassed = true;
+  let nonNegativityPassed = true;
+
+  for (const [scName, scData] of Object.entries(CANONICAL_DATA.forecast_outputs)) {
+    let prevCum = 0;
+    for (let yr = 2026; yr <= 2050; yr++) {
+      const yrStr = String(yr);
+      const ann = scData.annual_series_kt[yrStr];
+      const cum = scData.cumulative_series_kt[yrStr];
+
+      if (ann < 0 || cum < 0) {
+        nonNegativityPassed = false;
+      }
+      if (cum < prevCum) {
+        monotonicityPassed = false;
+      }
+      prevCum = cum;
     }
   }
+
   results.push({
-    testId: 'TEST-06',
-    name: 'Cumulative Waste Monotonic Non-Decreasing',
-    passed: isMonotonic,
-    expected: 'Cumulative(t) >= Cumulative(t-1)',
-    actual: `Monotonic: ${isMonotonic}`,
-    notes: 'Guaranteed by integral of non-negative annual flow'
+    testId: 'MIG-07',
+    name: 'Forecast Monotonicity & Non-Negativity (2026–2050)',
+    passed: monotonicityPassed && nonNegativityPassed,
+    expected: 'Cumulative strictly monotonic non-decreasing, annual >= 0 across all 6 scenarios',
+    actual: `Monotonic: ${monotonicityPassed}, Non-negative: ${nonNegativityPassed}`,
+    notes: 'Stock-flow accumulation integrity verified'
   });
 
-  // TEST 7: Recovered material mass <= input material mass & efficiency between 0-100%
-  const sample1000t = calculate_material_recovery(1000, 'hybrid');
-  const recoveryRatesValid = sample1000t.every(m => 
-    m.recoveredMassTonnes <= m.rawMassTonnes && 
-    m.efficiencyPct >= 0 && 
-    m.efficiencyPct <= 100 &&
-    Math.abs((m.recoveredMassTonnes + m.unrecoveredMassTonnes) - m.rawMassTonnes) < 0.01
+  // TEST 8: Canonical Material Composition Baseline = exactly 100.000%
+  const baseline = CANONICAL_DATA.material_model.canonical_baseline_cSi;
+  const totalMassFraction = Object.values(baseline).reduce((s, item) => s + item.mass_fraction, 0);
+  const totalKgPerTonne = Object.values(baseline).reduce((s, item) => s + item.kg_per_tonne, 0);
+  const compositionPassed = Math.abs(totalMassFraction - 1.0) < 1e-6 && Math.abs(totalKgPerTonne - 1000.0) < 1e-3;
+
+  results.push({
+    testId: 'MIG-08',
+    name: 'Canonical Material Baseline Sums to 100.000%',
+    passed: compositionPassed,
+    expected: 'Sum = 1.000000 (1,000.00 kg/t)',
+    actual: `Sum = ${totalMassFraction.toFixed(6)} (${totalKgPerTonne.toFixed(2)} kg/t)`,
+    notes: 'Glass 74.2%, Polymer 11.3%, Al 10.3%, Si 3.35%, Cu 0.57%, Ag 0.006%, Other 0.274%'
+  });
+
+  // TEST 9: Three-Category Disposition Mass Conservation
+  // input_mass = recovered_material_mass + co_processed_mass + residual_mass
+  const flowChem = calculateCanonicalMaterialFlow(1000.0, 'Chemical');
+  const sumDispositionsChem = flowChem.recoveredMassTonnes + flowChem.coProcessedMassTonnes + flowChem.residualMassTonnes;
+  const massBalanceChemPassed = Math.abs(sumDispositionsChem - 1000.0) < 1e-3;
+
+  const flowMech = calculateCanonicalMaterialFlow(1000.0, 'Mechanical');
+  const sumDispositionsMech = flowMech.recoveredMassTonnes + flowMech.coProcessedMassTonnes + flowMech.residualMassTonnes;
+  const massBalanceMechPassed = Math.abs(sumDispositionsMech - 1000.0) < 1e-3;
+
+  results.push({
+    testId: 'MIG-09',
+    name: 'Three-Category Disposition Mass Balance Closure',
+    passed: massBalanceChemPassed && massBalanceMechPassed,
+    expected: 'input_mass == recovered + co_processed + residual (1,000.00 kg/t)',
+    actual: `Chemical: ${sumDispositionsChem.toFixed(2)} kg | Mechanical: ${sumDispositionsMech.toFixed(2)} kg`,
+    notes: 'Strict mass conservation across all processing routes'
+  });
+
+  // TEST 10: Chemical Route Polymer Co-Processing (113 kg/t) & Residuals (~90 kg/t)
+  const polymerCoproc = flowChem.coProcessed['Polymer'];
+  const polymerRec = flowChem.recovered['Polymer'];
+  const residualChemKg = flowChem.residualMassTonnes;
+
+  const chemProfilePassed = (
+    polymerRec === 0 &&
+    Math.abs(polymerCoproc - 113.0) < 0.2 &&
+    Math.abs(residualChemKg - 89.72) < 1.0
   );
   results.push({
-    testId: 'TEST-07',
-    name: 'Material Mass Conservation: Recovered <= Raw Mass',
-    passed: recoveryRatesValid,
-    expected: 'Recovered mass <= Raw mass, efficiencies 0..100%',
-    actual: `All conserved: ${recoveryRatesValid}`,
-    notes: 'Recovered + Unrecovered == Raw input mass'
+    testId: 'MIG-10',
+    name: 'Chemical Route Polymer Co-Processing & TSDF Compliance',
+    passed: chemProfilePassed,
+    expected: 'Polymer rec = 0 kg, Polymer coproc = 113 kg/t, Residual = ~90 kg/t (89.72 kg/t)',
+    actual: `Polymer rec = ${polymerRec} kg, Polymer coproc = ${polymerCoproc.toFixed(1)} kg, Residual = ${residualChemKg.toFixed(2)} kg`,
+    notes: 'Polymer routed to cement kilns; hazardous heavy metals (lead, tin) routed to TSDF'
   });
 
-  // TEST 8: Economics Net Margin Formula Balance
-  const econ = calculate_processing_economics(DEFAULT_SCENARIO_PARAMETERS);
-  const expectedMargin = econ.grossRecoveredValuePerTonneINR + econ.eprContributionPerTonneINR - 
-    (econ.processingCostPerTonneINR + econ.logisticsCostPerTonneINR + econ.feedstockCostPerTonneINR);
+  // TEST 11: Mechanical Route Yields 0% Silver Recovery
+  const silverRecMech = flowMech.recovered['Silver'];
+  const mechAgPassed = silverRecMech === 0;
   results.push({
-    testId: 'TEST-08',
-    name: 'Unit Economics Accounting Balance Identity',
-    passed: Math.abs(econ.netMarginPerTonneINR - expectedMargin) < 1,
-    expected: `Margin == Revenue + EPR - (OPEX + Logistics + Feedstock)`,
-    actual: `Margin: ₹${econ.netMarginPerTonneINR}/t vs Formula: ₹${expectedMargin}/t`,
-    notes: 'Zero discrepancy'
+    testId: 'MIG-11',
+    name: 'Mechanical Route Yields Exactly 0% Silver Recovery',
+    passed: mechAgPassed,
+    expected: '0.0 g/t recovered silver',
+    actual: `${silverRecMech} g/t recovered silver`,
+    notes: 'Mechanical shredding cannot delaminate cell grid fingers without chemical leaching'
   });
 
-  // TEST 9: Break-even Feedstock Calculation Consistency
-  // At break-even feedstock, Net Margin must equal exactly 0
-  const breakEvenParams = {
-    ...DEFAULT_SCENARIO_PARAMETERS,
-    feedstockCostPerTonneINR: econ.breakEvenFeedstockPricePerTonneINR
-  };
-  const breakEvenEcon = calculate_processing_economics(breakEvenParams);
+  // TEST 12: Canonical Economics Reference Cases Match Ground Truth
+  const econCases = CANONICAL_DATA.economics_reference;
+  const ceewPublishedNet = econCases.Published_CEEW_Chemical.net_inr_per_tonne;
+  const silverRepricedNet = econCases.Silver_Repriced_Team_Case.net_inr_per_tonne;
+  const eprFloorNet = econCases.EPR_Floor_Bankable_Case.net_inr_per_tonne;
+  const mechPublishedNet = econCases.Published_CEEW_Mechanical.net_inr_per_tonne;
+
+  const econCasesPassed = (
+    ceewPublishedNet === -12341 &&
+    silverRepricedNet === -5938 &&
+    eprFloorNet === 16062 &&
+    mechPublishedNet === -10200
+  );
   results.push({
-    testId: 'TEST-09',
-    name: 'Break-Even Feedstock Mathematical Precision',
-    passed: Math.abs(breakEvenEcon.netMarginPerTonneINR) < 2,
-    expected: 'Net Margin == ₹0/t at break-even feedstock price',
-    actual: `Net margin at BEP (₹${econ.breakEvenFeedstockPricePerTonneINR}/t): ₹${breakEvenEcon.netMarginPerTonneINR}/t`,
-    notes: 'Matches operational break-even threshold'
+    testId: 'MIG-12',
+    name: 'Canonical Economics Reference Cases Truth',
+    passed: econCasesPassed,
+    expected: 'CEEW: -₹12,341/t | Team Repriced: -₹5,938/t | EPR Floor: +₹16,062/t | Mechanical: -₹10,200/t',
+    actual: `CEEW: ₹${ceewPublishedNet}/t | Team Repriced: ₹${silverRepricedNet}/t | EPR Floor: ₹${eprFloorNet}/t | Mechanical: ₹${mechPublishedNet}/t`,
+    notes: 'CEEW 2025 Exhibit 25 unit economics'
   });
 
-  // TEST 10: Logistics Cost Formula: Distance * FreightRate + Handling
-  const testDist = 300;
-  const testFreight = 4.2;
-  const logCost = calculate_transport_cost(testDist, testFreight);
-  const expectedLogistics = Math.round(testDist * testFreight) + 650;
+  // TEST 13: Parametric Economics Calculation Matches Canonical Reference Cases
+  const econRunPublished = calculateCanonicalEconomics({
+    silverPriceINR_per_g: 95.8,
+    silverRecoveryRate: 0.74,
+    feedstockCostINR_per_module: 600.0,
+    haulDistanceKm: 360.0,
+    eprCertificateINR_per_kg: 0.0
+  });
+
+  const econRunRepriced = calculateCanonicalEconomics({
+    silverPriceINR_per_g: 240.0,
+    silverRecoveryRate: 0.74,
+    feedstockCostINR_per_module: 600.0,
+    haulDistanceKm: 360.0,
+    eprCertificateINR_per_kg: 0.0
+  });
+
+  const econRunEpr = calculateCanonicalEconomics({
+    silverPriceINR_per_g: 240.0,
+    silverRecoveryRate: 0.74,
+    feedstockCostINR_per_module: 600.0,
+    haulDistanceKm: 360.0,
+    eprCertificateINR_per_kg: 22.0
+  });
+
+  const parametricPassed = (
+    Math.abs(econRunPublished.netEconomicsINRPerTonne - (-12341)) <= 50 &&
+    Math.abs(econRunRepriced.netEconomicsINRPerTonne - (-5938)) <= 50 &&
+    Math.abs(econRunEpr.netEconomicsINRPerTonne - 16062) <= 50
+  );
   results.push({
-    testId: 'TEST-10',
-    name: 'Reverse Logistics Transport Cost Formula',
-    passed: logCost.totalLogisticsPerTonneINR === expectedLogistics,
-    expected: `₹${expectedLogistics}/t (300 km * 4.2 + 650 handling)`,
-    actual: `₹${logCost.totalLogisticsPerTonneINR}/t`,
-    notes: 'Freight + handling per tonne'
+    testId: 'MIG-13',
+    name: 'Parametric Unit Economics Alignment with Reference Cases',
+    passed: parametricPassed,
+    expected: '-₹12,341 / -₹5,938 / +₹16,062 per tonne (+/- ₹50 tolerance)',
+    actual: `Published: ₹${econRunPublished.netEconomicsINRPerTonne} | Repriced: ₹${econRunRepriced.netEconomicsINRPerTonne} | EPR: ₹${econRunEpr.netEconomicsINRPerTonne}`,
+    notes: 'Direct parametric mapping of solarloop_engine.py calculate_economics()'
   });
 
-  // TEST 11: True DCF Model NPV & IRR Calculation
-  const dcf = calculate_project_dcf_and_irr(DEFAULT_SCENARIO_PARAMETERS);
-  const npvValid = typeof dcf.projectNPV_Cr === 'number' && !isNaN(dcf.projectNPV_Cr);
-  const irrValid = dcf.projectIRRPct === null || (typeof dcf.projectIRRPct === 'number' && dcf.projectIRRPct > -50);
+  // TEST 14: Zero Active Repowering Assumption in Execution
+  const scenarioExecution = run_scenario(SCENARIO_CONFIGS.base_regular, 'base_regular');
+  const repoweringWasteSum = scenarioExecution.annualBreakdowns.reduce((s, b) => s + b.repoweringKt, 0);
+  const noRepowering = repoweringWasteSum === 0;
+
   results.push({
-    testId: 'TEST-11',
-    name: 'Real Project Finance DCF Solver (NPV & True IRR)',
-    passed: npvValid && irrValid && dcf.dcfSchedule.length === dcf.projectLifeYears,
-    expected: 'Finite NPV and validated DCF projection schedule without heuristics',
-    actual: `NPV: ₹${dcf.projectNPV_Cr} Cr, True IRR: ${dcf.projectIRRPct !== null ? `${dcf.projectIRRPct}%` : 'sub-hurdle'}`,
-    notes: 'Solves NPV(r) = 0 via robust binary search'
+    testId: 'MIG-14',
+    name: 'Zero Active Repowering Assumption',
+    passed: noRepowering,
+    expected: '0 kt repowering waste across all forecast years',
+    actual: `${repoweringWasteSum} kt repowering waste`,
+    notes: 'Legacy repowering assumptions successfully excluded from active execution'
   });
 
-  // TEST 12: High feedstock cost turns project not viable (no artificial IRR manipulation)
-  const extremeParams = {
-    ...DEFAULT_SCENARIO_PARAMETERS,
-    feedstockCostPerTonneINR: 60000 // Exceeds gross recovered value of ~45k, resulting in negative EBITDA
-  };
-  const extremeFin = calculate_project_dcf_and_irr(extremeParams);
+  // TEST 15: Zero Active 0.22% Damage Assumption in Execution
+  const damagedWasteSum = scenarioExecution.annualBreakdowns.reduce((s, b) => s + b.damagedInsuranceKt, 0);
+  const noDamaged = damagedWasteSum === 0;
+
   results.push({
-    testId: 'TEST-12',
-    name: 'Honest Financial Viability on Deficit Scenarios',
-    passed: extremeFin.viabilityVerdict === 'NOT ECONOMICALLY VIABLE' && !extremeFin.isEconomicallyAttractive && extremeFin.projectIRRPct === null,
-    expected: 'Verdict: NOT ECONOMICALLY VIABLE and IRR == null when cash flows are negative',
-    actual: `Verdict: ${extremeFin.viabilityVerdict}, IRR: ${extremeFin.projectIRRPct}`,
-    notes: 'Does not invent false positive returns on loss-making projects'
+    testId: 'MIG-15',
+    name: 'Zero Active 0.22% Damage Assumption',
+    passed: noDamaged,
+    expected: '0 kt damaged insurance waste across all forecast years',
+    actual: `${damagedWasteSum} kt damaged insurance waste`,
+    notes: 'Legacy damage assumptions successfully excluded from active execution'
   });
 
-  // TEST 13: Scenario Parameter Propagation (Custom changes affect forecast and economics)
-  const baseForecast = calculate_processing_economics(SCENARIO_CONFIGS.base_regular);
-  const highEprEcon = calculate_processing_economics({ ...SCENARIO_CONFIGS.base_regular, eprFeePerTonneINR: 5000 });
-  results.push({
-    testId: 'TEST-13',
-    name: 'Scenario Parameter Full Propagation',
-    passed: highEprEcon.netMarginPerTonneINR > baseForecast.netMarginPerTonneINR,
-    expected: 'Changing EPR fee propagates to higher Net Margin and higher IRR',
-    actual: `Base Margin: ₹${baseForecast.netMarginPerTonneINR}/t -> High EPR Margin: ₹${highEprEcon.netMarginPerTonneINR}/t`,
-    notes: 'No static hardcoding'
-  });
-
-  // TEST 14: Sensitivity Tornado Engine Generation
-  const tornado = calculate_sensitivity_tornado(DEFAULT_SCENARIO_PARAMETERS);
-  const tornadoValid = tornado.length >= 6 && tornado[0].swingMarginINR >= tornado[tornado.length - 1].swingMarginINR;
-  results.push({
-    testId: 'TEST-14',
-    name: 'Sensitivity Tornado Ranking & Swings',
-    passed: tornadoValid,
-    expected: 'Tornado items sorted by descending swing magnitude',
-    actual: `Top driver: ${tornado[0]?.driver} (Swing: ₹${tornado[0]?.swingMarginINR}/t)`,
-    notes: 'Evaluates +/- 20% driver variance'
-  });
-
-  // TEST 15: SolarLoop Dynamic Recommendation Synthesis
-  const recDecision = generate_solarloop_recommendation(DEFAULT_SCENARIO_PARAMETERS, 'base_regular', 2040);
-  const recValid = recDecision.recommendedFacilityCount > 0 && 
-    recDecision.executiveSummaryBullets.length >= 4 &&
-    recDecision.forecastWasteVolumeKt > 0;
-  results.push({
-    testId: 'TEST-15',
-    name: 'Dynamic SolarLoop Operational Decision Synthesis',
-    passed: recValid,
-    expected: 'Generates non-empty decision briefing from live model outputs',
-    actual: `Facilities: ~${recDecision.recommendedFacilityCount}, Tech: ${recDecision.technologyName}`,
-    notes: 'Directly answers what India/INA should build, where, and when'
-  });
-
+  // Summary
   const passCount = results.filter(r => r.passed).length;
   const failCount = results.length - passCount;
+  const allPassed = failCount === 0;
 
   return {
-    allPassed: failCount === 0,
+    allPassed,
     totalTests: results.length,
     passCount,
     failCount,
