@@ -271,7 +271,7 @@ export interface SolarLoopRecommendation {
   projectIRRPct: number | null;
   projectNPV_Cr: number;
   viabilityVerdict: string;
-  co2eAvoidedMt: number;
+  co2eAvoidedMt: number | null;
   policyMandateRequirement: string;
   inaStrategicRole: string;
   executiveSummaryBullets: string[];
@@ -332,11 +332,20 @@ export interface ScenarioParameters {
 
 export interface EnvironmentalImpactMetrics {
   totalMassRecoveredKt: number;
+  coProcessedMassKt: number;
+  residualMassKt: number;
   wasteDivertedFromLandfillKt: number;
-  co2eAvoidedMt: number;
-  rawSandSavedKt: number;
-  bauxiteSavedKt: number;
-  hazardousHeavyMetalsSafelyHandledTonnes: number;
+  co2eAvoidedMt: number | null;
+  rawSandSavedKt: number | null;
+  bauxiteSavedKt: number | null;
+  hazardousHeavyMetalsSafelyHandledTonnes: number | null;
+  environmentalFactors: {
+    recovery: 'CANONICAL';
+    co2e: 'UNSUPPORTED_NEEDS_EVIDENCE';
+    sand: 'UNSUPPORTED_NEEDS_EVIDENCE';
+    bauxite: 'UNSUPPORTED_NEEDS_EVIDENCE';
+    hazardousContainment: 'UNSUPPORTED_NEEDS_EVIDENCE';
+  };
 }
 
 export interface CanonicalMilestone {

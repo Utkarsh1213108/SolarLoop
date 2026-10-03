@@ -207,6 +207,13 @@ export const SCENARIO_CONFIGS: Record<ForecastScenarioId, ScenarioParameters> = 
 
 export const DEFAULT_SCENARIO_PARAMETERS: ScenarioParameters = SCENARIO_CONFIGS.base_regular;
 
+export const PUBLISHED_EXTERNAL_CO2E_REFERENCE = {
+  valueMt: 37,
+  horizonYear: 2047,
+  source: 'India Solar PV Circularity Dossier',
+  classification: 'EXTERNALLY_SOURCED'
+} as const;
+
 /**
  * Sizing national plants based on standard 3,600 tpa CEEW benchmark facility
  */
@@ -363,21 +370,29 @@ export function calculate_sensitivity_tornado(params?: Partial<ScenarioParameter
  * Environmental impact calculator grounded on canonical material displacement
  */
 export function calculate_environmental_impact(
-  cumulativeWasteKt: number,
-  recoveryEfficiencyPct: number = 89.0
+  cumulativeWasteKt: number
 ): EnvironmentalImpactMetrics {
-  const efficiency = recoveryEfficiencyPct / 100;
-  const recoveredKt = cumulativeWasteKt * efficiency;
-  const glassKt = recoveredKt * 0.742;
-  const alKt = recoveredKt * 0.103;
+  const materialFlow = calculateCanonicalMaterialFlow(cumulativeWasteKt * 1000, 'Chemical');
+  const recoveredKt = materialFlow.recoveredMassTonnes / 1000;
+  const coProcessedKt = materialFlow.coProcessedMassTonnes / 1000;
+  const residualKt = materialFlow.residualMassTonnes / 1000;
 
   return {
     totalMassRecoveredKt: Math.round(recoveredKt),
-    wasteDivertedFromLandfillKt: Math.round(recoveredKt),
-    co2eAvoidedMt: Number((recoveredKt * 1.45 / 1000).toFixed(2)),
-    rawSandSavedKt: Math.round(glassKt * 1.1),
-    bauxiteSavedKt: Math.round(alKt * 4.0),
-    hazardousHeavyMetalsSafelyHandledTonnes: Math.round(cumulativeWasteKt * 0.00006 * 1000 * 1.5) // Silver & trace lead containment
+    coProcessedMassKt: Number(coProcessedKt.toFixed(2)),
+    residualMassKt: Number(residualKt.toFixed(2)),
+    wasteDivertedFromLandfillKt: Math.round(recoveredKt + coProcessedKt),
+    co2eAvoidedMt: null,
+    rawSandSavedKt: null,
+    bauxiteSavedKt: null,
+    hazardousHeavyMetalsSafelyHandledTonnes: null,
+    environmentalFactors: {
+      recovery: 'CANONICAL',
+      co2e: 'UNSUPPORTED_NEEDS_EVIDENCE',
+      sand: 'UNSUPPORTED_NEEDS_EVIDENCE',
+      bauxite: 'UNSUPPORTED_NEEDS_EVIDENCE',
+      hazardousContainment: 'UNSUPPORTED_NEEDS_EVIDENCE'
+    }
   };
 }
 
@@ -410,7 +425,7 @@ export function run_scenario(
   const logisticsComp = calculate_logistics_comparison(m40.annual_waste_kt, params);
   const techEval = evaluate_technology_pathways(m40.annual_waste_kt);
   const tornado = calculate_sensitivity_tornado(params);
-  const env = calculate_environmental_impact(m50.cumulative_waste_kt, params.recoveryEfficiencyPct);
+  const env = calculate_environmental_impact(m50.cumulative_waste_kt);
 
   // Canonical Economics Reference
   const econRef = CANONICAL_DATA.economics_reference;
@@ -590,5 +605,5 @@ export function generate_management_summary(
 • Chemical recycling net economics follow the canonical Silver Re-Priced Team Case.
 • Policy sensitivity follows the canonical EPR Floor Bankable Case.
 • Reverse logistics hub-and-spoke consolidation cuts average haul from 360 km to 100 km, saving ~₹3,217/t.
-• Cumulative decarbonization displacement represents approximately ${environmental.co2eAvoidedMt} Mt CO2e avoided by 2050.`;
+• Environmental LCA displacement: unavailable — evidence required for defensible CO2e factors.`;
 }

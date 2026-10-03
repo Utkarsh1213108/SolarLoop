@@ -168,10 +168,10 @@ export const MethodologyDrawer: React.FC = () => {
               <div className="p-3 bg-slate-50 border border-slate-200 rounded-md">
                 <div className="text-slate-500 mb-1 font-sans font-medium">Decarbonisation Displacement:</div>
                 <div className="text-slate-900 font-bold">
-                  CO2e_avoided = TotalRecoveredMass_t × 1.85 tCO2e/t
+                  CO2e_avoided = Unavailable — evidence required
                 </div>
                 <div className="text-slate-500 mt-1.5 text-[11px] font-sans">
-                  Derived from primary aluminium smelting displacement (approx. 11.5 tCO2e/t Al) plus solar float glass furnace emissions abatement (0.35 tCO2e/t glass).
+                  No defensible environmental conversion factor is present in the canonical dataset or validation register.
                 </div>
               </div>
             </div>

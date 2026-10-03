@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useScenario } from '../../context/ScenarioContext';
+import { PUBLISHED_EXTERNAL_CO2E_REFERENCE } from '../../models/coreCalculations';
 import { DataProvenanceBadge } from '../common/DataProvenanceBadge';
 import { 
   Leaf, 
@@ -32,7 +33,7 @@ export const EnvironmentalImpactView: React.FC = () => {
           </p>
         </div>
         <div className="flex items-center gap-3">
-          <DataProvenanceBadge tier="MODEL OUTPUT" sourceText="Displacement LCA Factors (1.85 tCO2e/t)" />
+          <DataProvenanceBadge tier="MODEL OUTPUT" sourceText="Canonical disposition; LCA factors unavailable" />
           <button
             type="button"
             onClick={() => askIntelligence('How is CO2e avoided calculated?')}
@@ -58,7 +59,10 @@ export const EnvironmentalImpactView: React.FC = () => {
             {(impact.totalMassRecoveredKt / unitDivider).toLocaleString()} {unitLabel}
           </div>
           <div className="text-[11px] text-slate-500 font-mono mt-1">
-            Secondary glass cullet, Al, Cu, Si & Ag
+            Canonical recovered material
+          </div>
+          <div className="text-[10px] text-slate-500 font-mono mt-2 pt-2 border-t border-slate-100">
+            Co-processed: {impact.coProcessedMassKt.toLocaleString()} kt · Residual: {impact.residualMassKt.toLocaleString()} kt
           </div>
         </div>
 
@@ -74,7 +78,7 @@ export const EnvironmentalImpactView: React.FC = () => {
             {(impact.wasteDivertedFromLandfillKt / unitDivider).toLocaleString()} {unitLabel}
           </div>
           <div className="text-[11px] text-emerald-700 font-mono mt-1 font-medium">
-            100% avoided informal dumping
+            Recovered + co-processed mass; canonical disposition
           </div>
         </div>
 
@@ -87,7 +91,7 @@ export const EnvironmentalImpactView: React.FC = () => {
             </span>
           </div>
           <div className="mt-2 text-3xl font-bold text-emerald-800 font-mono tabular-nums">
-            ~37 <span className="text-base font-normal font-sans text-slate-500">Mt CO2e</span>
+            Published external reference: ~{PUBLISHED_EXTERNAL_CO2E_REFERENCE.valueMt} <span className="text-base font-normal font-sans text-slate-500">Mt CO2e</span>
           </div>
           <div className="text-[11px] text-slate-500 font-mono mt-1">
             National Solar Dossier 2047 Benchmark
@@ -117,10 +121,10 @@ export const EnvironmentalImpactView: React.FC = () => {
             <div className="p-3 bg-slate-50 border border-slate-200 rounded-lg font-mono text-[11px] space-y-1">
               <div className="text-slate-500 font-sans font-medium">Displacement Formula:</div>
               <div className="text-slate-900 font-bold">
-                CO2e_avoided = Total_Recovered_Mass (t) × 1.85 tCO2e/tonne
+                CO2e_avoided = Unavailable — evidence required
               </div>
               <div className="text-slate-500 font-sans text-[11px] pt-1">
-                Derived from life-cycle inventory (LCI) databases for primary vs secondary material extraction in India:
+                No defensible CO2e factor is present in the canonical dataset or validation register.
               </div>
             </div>
 
@@ -128,27 +132,27 @@ export const EnvironmentalImpactView: React.FC = () => {
               <div className="p-3 border border-slate-200 rounded-lg space-y-1">
                 <span className="font-semibold text-slate-900">Aluminium Frame Remelting</span>
                 <p className="text-slate-600 text-[11px] leading-relaxed">
-                  Avoids ~11.5 tCO2e per tonne of aluminium by bypassing bauxite refining and bauxite mining (saves ~4 tonnes of raw bauxite per tonne Al).
+                  Unavailable — aluminium displacement factor requires evidence.
                 </p>
               </div>
 
               <div className="p-3 border border-slate-200 rounded-lg space-y-1">
                 <span className="font-semibold text-slate-900">Solar Float Glass Cullet</span>
                 <p className="text-slate-600 text-[11px] leading-relaxed">
-                  Lowers furnace melting temperatures by 250°C and eliminates carbonate raw batch calcination emissions (saves ~1.1 tonnes of silica sand per tonne).
+                  Unavailable — glass displacement and sand factor require evidence.
                 </p>
               </div>
 
               <div className="p-3 border border-slate-200 rounded-lg space-y-1">
                 <span className="font-semibold text-slate-900">Silicon & Silver Reclaiming</span>
                 <p className="text-slate-600 text-[11px] leading-relaxed">
-                  Circumvents trichlorosilane gas distillation and high-temperature Siemens reduction reactors for virgin polysilicon.
+                  Unavailable — silicon and silver displacement factors require evidence.
                 </p>
               </div>
             </div>
 
             <div className="text-[10px] text-slate-400 font-mono italic">
-              Note: The 37 Mt figure is a research reference estimate from the India Solar PV Circularity Dossier. It is not an independently audited SolarLoop assurance.
+              Published external reference: the {PUBLISHED_EXTERNAL_CO2E_REFERENCE.valueMt} Mt figure from the {PUBLISHED_EXTERNAL_CO2E_REFERENCE.source}; not a SolarLoop runtime calculation.
             </div>
           </div>
         )}
@@ -163,11 +167,11 @@ export const EnvironmentalImpactView: React.FC = () => {
           </h3>
         </div>
         <p className="text-xs text-slate-600 leading-relaxed max-w-3xl">
-          Standard crystalline silicon modules contain ~12–15 grams of lead (Pb) in soldering ribbon plus antimony fining agents in glass. Decommissioning via certified circular pathways ensures safe handling of heavy metals in designated Treatment, Storage, and Disposal Facilities (TSDFs), preventing groundwater leaching.
+          Lead content and hazardous-metal mass are unavailable from the canonical material model. Certified decommissioning routes the canonical residual stream to designated Treatment, Storage, and Disposal Facilities (TSDFs); quantitative containment impact requires evidence.
         </p>
         <div className="p-3 bg-slate-50 border border-slate-200 rounded-lg text-xs font-mono text-slate-800 flex justify-between items-center tabular-nums">
           <span>Hazardous Heavy Metals Safely Managed:</span>
-          <span className="font-bold text-slate-900">{impact.hazardousHeavyMetalsSafelyHandledTonnes.toLocaleString()} tonnes</span>
+          <span className="font-bold text-slate-900">Unavailable — evidence required</span>
         </div>
       </div>
     </div>

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useScenario } from '../../context/ScenarioContext';
 import { generate_management_summary } from '../../models/coreCalculations';
+import { PUBLISHED_EXTERNAL_CO2E_REFERENCE } from '../../models/coreCalculations';
 import { DataProvenanceBadge } from '../common/DataProvenanceBadge';
 import { Printer, Copy, Check, FileText, Sparkles } from 'lucide-react';
 
@@ -82,10 +83,12 @@ ${managementSummary}
 • Estimated Project IRR: ${simulationResult.economics.projectIRRPct}%
 
 ## 9. Environmental Impact
-• Research Benchmark Avoided Emissions: ~37 Mt CO2e avoided by 2047
+• Published External Reference: ~${PUBLISHED_EXTERNAL_CO2E_REFERENCE.valueMt} Mt CO2e by ${PUBLISHED_EXTERNAL_CO2E_REFERENCE.horizonYear}; not a SolarLoop runtime calculation
 • Cumulative Diverted Landfill Mass: ${simulationResult.environmental.wasteDivertedFromLandfillKt.toLocaleString()} kt
-• Virgin Bauxite Ore Spared: ${simulationResult.environmental.bauxiteSavedKt.toLocaleString()} kt
-• Heavy Metal Safe Containment: ${simulationResult.environmental.hazardousHeavyMetalsSafelyHandledTonnes.toLocaleString()} tonnes
+• Canonical Co-Processed Mass: ${simulationResult.environmental.coProcessedMassKt.toLocaleString()} kt
+• Canonical Residual Mass: ${simulationResult.environmental.residualMassKt.toLocaleString()} kt
+• Virgin Bauxite Ore Spared: Unavailable — evidence required
+• Heavy Metal Safe Containment: Unavailable — evidence required
 
 ## 10. Policy & Compliance
 • Current Law: E-Waste Management Rules 2022 (Generic producer registration)

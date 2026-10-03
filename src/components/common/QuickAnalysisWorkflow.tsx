@@ -17,6 +17,7 @@ import {
   RotateCcw
 } from 'lucide-react';
 import { PlantCapacityTier } from '../../types';
+import { PUBLISHED_EXTERNAL_CO2E_REFERENCE } from '../../models/coreCalculations';
 
 export type AnalysisType = 
   | 'forecast' 
@@ -490,7 +491,7 @@ export const QuickAnalysisWorkflow: React.FC<QuickAnalysisWorkflowProps> = ({
                   Avoided CO2e Standard
                 </label>
                 <div className="p-2.5 rounded-lg bg-white border border-slate-200 font-mono text-slate-800">
-                  1.85 tCO2e / tonne recovered material
+                  Unavailable — evidence required
                 </div>
               </div>
             </div>
@@ -589,7 +590,7 @@ export const QuickAnalysisWorkflow: React.FC<QuickAnalysisWorkflowProps> = ({
                       <>{useInaNetwork ? '700+ INA partner depots cut rural consolidation freight by 35%.' : 'Six core solar states concentrate >68% of cumulative decommissioning.'}</>
                     )}
                     {selectedType === 'environment' && (
-                      <>Diverting national solar waste through 2047 avoids approximately <strong className="text-teal-300 font-mono">~37 Mt CO2e</strong>.</>
+                      <>Published external reference: <strong className="text-teal-300 font-mono">~{PUBLISHED_EXTERNAL_CO2E_REFERENCE.valueMt} Mt CO2e</strong> by {PUBLISHED_EXTERNAL_CO2E_REFERENCE.horizonYear}; not a runtime calculation.</>
                     )}
                   </p>
                 </div>
@@ -624,7 +625,7 @@ export const QuickAnalysisWorkflow: React.FC<QuickAnalysisWorkflowProps> = ({
                     {selectedType === 'pathway' && 'Silver represents only 0.006% of mass but &gt;25% of commercial mineral value.'}
                     {selectedType === 'economics' && 'Aluminium frames and silver paste subsidize the handling of bulk glass and polymers.'}
                     {selectedType === 'logistics' && 'Un-compacted solar modules have high volume-to-weight ratios; empty transport is uneconomical.'}
-                    {selectedType === 'environment' && 'Secondary aluminium saves 95% of Hall-Héroult electricity compared to virgin bauxite ore.'}
+                    {selectedType === 'environment' && 'Canonical recovered, co-processed, and residual masses are available; LCA factors require evidence.'}
                   </p>
                 </div>
               </div>
@@ -641,7 +642,7 @@ export const QuickAnalysisWorkflow: React.FC<QuickAnalysisWorkflowProps> = ({
                     {selectedType === 'pathway' && <>OpEx: ₹{simulationResult.economics.processingCostPerTonneINR.toLocaleString()}/t · CapEx: ₹18–25 Cr per line.</>}
                     {selectedType === 'economics' && <>Break-even feedstock gate price: <strong className="text-white font-mono">₹{simulationResult.economics.breakEvenFeedstockPricePerTonneINR.toLocaleString()}/t</strong>.</>}
                     {selectedType === 'logistics' && <>Consolidation freight: <strong className="text-white font-mono">₹{simulationResult.economics.logisticsCostPerTonneINR.toLocaleString()}/t</strong> (@{scenarioParams.avgTransportDistanceKm} km).</>}
-                    {selectedType === 'environment' && <>Net negative abatement cost (financially self-sustaining through recovered mineral sales).</>}
+                    {selectedType === 'environment' && <>Unavailable — no defensible environmental conversion factor is configured.</>}
                   </p>
                 </div>
               </div>
@@ -658,7 +659,7 @@ export const QuickAnalysisWorkflow: React.FC<QuickAnalysisWorkflowProps> = ({
                     {selectedType === 'pathway' && <>Prevents downcycling into road aggregate; feeds secondary float furnaces.</>}
                     {selectedType === 'economics' && <>Generates ₹{simulationResult.economics.annualPlantEBITDA_INR_Cr} Cr annual EBITDA per plant.</>}
                     {selectedType === 'logistics' && <>Eliminates 1,200+ tonnes of transit CO2 via reverse payload back-hauling.</>}
-                    {selectedType === 'environment' && <>Spares 4.2 Mt virgin bauxite and safely isolates 14,000 t of toxic lead.</>}
+                    {selectedType === 'environment' && <>Canonical disposition mass is reported; bauxite and hazardous-containment impacts require evidence.</>}
                   </p>
                 </div>
               </div>
