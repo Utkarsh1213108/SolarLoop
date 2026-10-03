@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useScenario } from '../../context/ScenarioContext';
+import { calculateCanonicalMaterialFlow } from '../../data/canonicalLoader';
 import { DataProvenanceBadge } from '../common/DataProvenanceBadge';
 import { 
   Atom, 
@@ -31,14 +32,22 @@ export const MaterialRecoveryView: React.FC = () => {
 
   const activeElementData = baselineMaterials[activeElement] || baselineMaterials['Aluminium'];
 
-  // 1 tonne mass balance decomposition under selected route
-  const sample1Tonne = 1000.0; // kg
+  // 1 tonne mass balance decomposition under the selected canonical route.
+  const materialFlow = calculateCanonicalMaterialFlow(1, selectedRoute);
   const recYield = currentRoute.material_recovery_yields[activeElement] ?? 0;
   const coprocYield = currentRoute.co_processing_yields[activeElement] ?? 0;
   const rawMassKg = activeElementData.kg_per_tonne;
   const recoveredKg = rawMassKg * recYield;
   const coprocessedKg = rawMassKg * coprocYield;
   const residualKg = rawMassKg - (recoveredKg + coprocessedKg);
+  const formatMass = (massTonnes: number, element: string) => element === 'Silver'
+    ? `${(massTonnes * 1000000).toFixed(1)} g`
+    : `${massTonnes.toFixed(2)} kg`;
+  const disposition = coprocessedKg > 0
+    ? 'Cement co-processing'
+    : recoveredKg > 0
+      ? 'Recovered material'
+      : 'TSDF residual';
 
   return (
     <div className="p-6 space-y-6 max-w-7xl mx-auto">
@@ -102,6 +111,9 @@ export const MaterialRecoveryView: React.FC = () => {
                 </div>
                 <div className="text-[11px] font-mono text-slate-500 mt-1.5">
                   {m.kg_per_tonne} kg/t
+                </div>
+                <div className="text-[10px] text-slate-600 mt-1">
+                  Yield: {((currentRoute.material_recovery_yields[m.element] ?? 0) * 100).toFixed(0)}%
                 </div>
                 <div className="text-[10px] text-slate-400 truncate mt-0.5">
                   {m.source.split('/')[0]}
@@ -183,14 +195,17 @@ export const MaterialRecoveryView: React.FC = () => {
                 <span>1. Recovered Material</span>
               </span>
               <span className="text-xs font-mono font-bold text-emerald-900">
-                {selectedRoute === 'Chemical' ? '797.3 kg' : '798.8 kg'} (79.7%)
+                {materialFlow.recoveredMassTonnes.toFixed(2)} kg ({materialFlow.recoveredPct.toFixed(2)}%)
               </span>
             </div>
             <p className="text-xs text-slate-700 leading-relaxed">
               {currentRoute.disposition_categories.recovered_material}
             </p>
             <div className="text-[11px] font-mono text-emerald-900 pt-1">
-              Aluminium remelt (102 kg) + Glass cullet (660 kg) + Silicon (30 kg) + Copper (4.7 kg) {selectedRoute === 'Chemical' ? '+ Silver (44.4 g)' : '+ Silver (0 g)'}
+              {Object.entries(materialFlow.recovered)
+                .filter(([, mass]) => mass > 0)
+                .map(([element, mass]) => `${element} (${formatMass(mass, element)})`)
+                .join(' + ') || 'None'}
             </div>
           </div>
 
@@ -202,7 +217,7 @@ export const MaterialRecoveryView: React.FC = () => {
                 <span>2. Cement Co-Processing</span>
               </span>
               <span className="text-xs font-mono font-bold text-amber-900">
-                {selectedRoute === 'Chemical' ? '113.0 kg (11.3%)' : '0.0 kg (0.0%)'}
+                {materialFlow.coProcessedMassTonnes.toFixed(2)} kg ({materialFlow.coProcessedPct.toFixed(2)}%)
               </span>
             </div>
             <p className="text-xs text-slate-700 leading-relaxed">
@@ -223,7 +238,7 @@ export const MaterialRecoveryView: React.FC = () => {
                 <span>3. Residual TSDF Disposal</span>
               </span>
               <span className="text-xs font-mono font-bold text-slate-800">
-                {selectedRoute === 'Chemical' ? '89.7 kg (9.0%)' : '201.2 kg (20.1%)'}
+                {materialFlow.residualMassTonnes.toFixed(2)} kg ({materialFlow.residualPct.toFixed(2)}%)
               </span>
             </div>
             <p className="text-xs text-slate-700 leading-relaxed">
@@ -242,6 +257,9 @@ export const MaterialRecoveryView: React.FC = () => {
             <span className="font-mono text-teal-800">
               Recovery Yield: {((currentRoute.material_recovery_yields[activeElement] ?? 0) * 100).toFixed(0)}%
             </span>
+          </div>
+          <div className="font-mono text-slate-700">
+            Input: {formatMass(rawMassKg / 1000, activeElement)} → Recovered: {formatMass(recoveredKg / 1000, activeElement)} → {disposition}
           </div>
           <p className="text-slate-600 leading-relaxed">
             <strong>Offtake Grade & Destination:</strong> {currentRoute.offtake_grade_notes[activeElement] || 'Industrial offtake'}
