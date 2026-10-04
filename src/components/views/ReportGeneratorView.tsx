@@ -16,6 +16,13 @@ export const ReportGeneratorView: React.FC = () => {
 
   const [copied, setCopied] = useState(false);
 
+  if (!simulationResult) {
+  return (
+    <div className="p-6 text-sm text-slate-500">
+      Loading canonical scenario data...
+    </div>
+  );
+}
   const managementSummary = generate_management_summary(
     activeScenario,
     simulationResult.milestones,

@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { useScenario } from '../../context/ScenarioContext';
 import { DataProvenanceBadge } from '../common/DataProvenanceBadge';
-import { CANONICAL_SCENARIOS_META } from '../../data/canonicalLoader';
+import { calculateCanonicalMaterialFlow, CANONICAL_SCENARIOS_META } from '../../data/canonicalLoader';
 import { calculate_required_plants, STANDARD_PLANT_CAPACITY_TPA } from '../../models/coreCalculations';
 import { 
   TrendingUp, 
@@ -62,6 +62,11 @@ export const OverviewView: React.FC<OverviewViewProps> = ({ onNavigate }) => {
 
   // Economic reference cases
   const econCases = canonicalData.economics_reference;
+  const materialFlow = useMemo(() => calculateCanonicalMaterialFlow(1, 'Chemical'), [canonicalData]);
+  const formatNet = (value: number) => `${value >= 0 ? '+' : ''}₹${value.toLocaleString()}`;
+  const formatMaterialMass = (element: string, massTonnes: number) => element === 'Silver'
+    ? `${(massTonnes * 1_000_000).toFixed(1)} g`
+    : `${(massTonnes * 1000).toFixed(['Glass', 'Polymer', 'Aluminium'].includes(element) ? 1 : 2)} kg`;
 
   // Time-series arrays (2026 to 2050)
   const years = Object.keys(activeCanonicalScenario.annual_series_kt)
@@ -127,8 +132,7 @@ export const OverviewView: React.FC<OverviewViewProps> = ({ onNavigate }) => {
               <strong className="text-white font-semibold">
                 {(m2050.cumulative_waste_kt / unitDivider).toLocaleString(undefined, { maximumFractionDigits: 1 })} {unitLabel} by 2050
               </strong>
-              . Commercial viability hinges on statutory EPR support to bridge the current{' '}
-              <strong className="text-rose-300">{econCases.Silver_Repriced_Team_Case.net_inr_per_tonne.toLocaleString()} / tonne</strong> processing margin.
+              . Commercial viability is reference-case dependent, with the canonical economics spanning published, silver-repriced and EPR-floor cases.
             </p>
           </div>
 
@@ -175,14 +179,14 @@ export const OverviewView: React.FC<OverviewViewProps> = ({ onNavigate }) => {
 
             <div className="bg-slate-800/80 border border-slate-700/70 rounded-xl p-4">
               <div className="text-[11px] font-mono text-slate-400 uppercase tracking-wider">
-                Circularity Unit Margin
+                Silver-Repriced Reference Margin
               </div>
               <div className="text-2xl font-bold font-mono text-rose-300 mt-1">
                 {econCases.Silver_Repriced_Team_Case.net_inr_per_tonne.toLocaleString()}
                 <span className="text-xs text-slate-400 font-sans ml-1">/t</span>
               </div>
               <div className="text-xs text-emerald-400 mt-1">
-                EPR floor case: {econCases.EPR_Floor_Bankable_Case.net_inr_per_tonne.toLocaleString()}/t
+                EPR-floor reference: {econCases.EPR_Floor_Bankable_Case.net_inr_per_tonne.toLocaleString()}/t
               </div>
             </div>
           </div>
@@ -490,10 +494,10 @@ export const OverviewView: React.FC<OverviewViewProps> = ({ onNavigate }) => {
               1. Published CEEW Benchmark
             </span>
             <div className="text-xl font-bold text-rose-700">
-              −₹12,341 <span className="text-xs font-sans text-slate-500">/t</span>
+              {formatNet(econCases.Published_CEEW_Chemical.net_inr_per_tonne)} <span className="text-xs font-sans text-slate-500">/t</span>
             </div>
             <div className="text-[11px] text-slate-600 font-sans leading-tight">
-              CEEW (2025) baseline with silver valued at ₹95.8/g, procurement fee ₹600/panel, and zero EPR certificate contribution.
+              {econCases.Published_CEEW_Chemical.notes}
             </div>
             <div className="pt-2 text-[10px] text-slate-400 border-t border-slate-200 font-mono">
               Status: Published Reference
@@ -506,10 +510,10 @@ export const OverviewView: React.FC<OverviewViewProps> = ({ onNavigate }) => {
               2. Silver Re-Priced Team Case
             </span>
             <div className="text-xl font-bold text-rose-600">
-              −₹5,938 <span className="text-xs font-sans text-slate-500">/t</span>
+              {formatNet(econCases.Silver_Repriced_Team_Case.net_inr_per_tonne)} <span className="text-xs font-sans text-slate-500">/t</span>
             </div>
             <div className="text-[11px] text-slate-600 font-sans leading-tight">
-              Updates silver revenue to ₹240/g (+₹6,403/t value added), narrowing operating loss while remaining in the red without policy intervention.
+              {econCases.Silver_Repriced_Team_Case.notes}
             </div>
             <div className="pt-2 text-[10px] text-teal-700 border-t border-slate-100 font-mono font-medium">
               Status: Current Market Quote
@@ -522,10 +526,10 @@ export const OverviewView: React.FC<OverviewViewProps> = ({ onNavigate }) => {
               3. EPR Policy Floor Case
             </span>
             <div className="text-2xl font-bold text-emerald-700">
-              +₹16,062 <span className="text-xs font-sans text-emerald-900">/t</span>
+              {formatNet(econCases.EPR_Floor_Bankable_Case.net_inr_per_tonne)} <span className="text-xs font-sans text-emerald-900">/t</span>
             </div>
             <div className="text-[11px] text-emerald-900 font-sans leading-tight">
-              Notifying mandatory CEEW14 EPR certificate floor of ≥₹22/kg (+₹22,000/t revenue) flips chemical recycling into bankable territory.
+              {econCases.EPR_Floor_Bankable_Case.notes}
             </div>
             <div className="pt-2 text-[10px] text-emerald-800 border-t border-emerald-200 font-mono font-bold">
               Status: Required Policy Mandate
@@ -538,10 +542,10 @@ export const OverviewView: React.FC<OverviewViewProps> = ({ onNavigate }) => {
               4. Mechanical Shredding Route
             </span>
             <div className="text-xl font-bold text-slate-700">
-              −₹10,200 <span className="text-xs font-sans text-slate-500">/t</span>
+              {formatNet(econCases.Published_CEEW_Mechanical.net_inr_per_tonne)} <span className="text-xs font-sans text-slate-500">/t</span>
             </div>
             <div className="text-[11px] text-slate-600 font-sans leading-tight">
-              Lower capex/opex, but zero silver recovery leaves economics permanently negative. Downcycles glass into low-grade aggregate.
+              {econCases.Published_CEEW_Mechanical.notes}
             </div>
             <div className="pt-2 text-[10px] text-slate-400 border-t border-slate-200 font-mono">
               Status: Published Benchmark
@@ -584,70 +588,70 @@ export const OverviewView: React.FC<OverviewViewProps> = ({ onNavigate }) => {
           {/* Glass */}
           <div className="p-3 rounded-xl border border-slate-200 bg-slate-50 space-y-1">
             <span className="text-[10px] text-slate-400 block uppercase">Float Glass</span>
-            <div className="text-base font-bold text-slate-900">674 kg</div>
-            <div className="text-[10px] text-teal-700 font-bold">67.4% mass</div>
+            <div className="text-base font-bold text-slate-900">{formatMaterialMass('Glass', materialFlow.contained.Glass)}</div>
+            <div className="text-[10px] text-teal-700 font-bold">Recovered: {formatMaterialMass('Glass', materialFlow.recovered.Glass)}</div>
             <div className="text-[10px] text-slate-500 pt-1 border-t border-slate-200 font-sans">
-              90% recovered into cullet & abrasives
+              Yield: {(materialFlow.recovered.Glass / materialFlow.contained.Glass * 100).toFixed(0)}% · canonical recovered material
             </div>
           </div>
 
           {/* Aluminium */}
           <div className="p-3 rounded-xl border border-slate-200 bg-slate-50 space-y-1">
             <span className="text-[10px] text-slate-400 block uppercase">Al Frame</span>
-            <div className="text-base font-bold text-slate-900">100 kg</div>
-            <div className="text-[10px] text-teal-700 font-bold">10.0% mass</div>
+            <div className="text-base font-bold text-slate-900">{formatMaterialMass('Aluminium', materialFlow.contained.Aluminium)}</div>
+            <div className="text-[10px] text-teal-700 font-bold">Recovered: {formatMaterialMass('Aluminium', materialFlow.recovered.Aluminium)}</div>
             <div className="text-[10px] text-slate-500 pt-1 border-t border-slate-200 font-sans">
-              100% recovered for remelt billets
+              Yield: {(materialFlow.recovered.Aluminium / materialFlow.contained.Aluminium * 100).toFixed(0)}% · canonical recovered material
             </div>
           </div>
 
           {/* Polymer */}
           <div className="p-3 rounded-xl border border-slate-200 bg-slate-50 space-y-1">
             <span className="text-[10px] text-slate-400 block uppercase">Polymer / EVA</span>
-            <div className="text-base font-bold text-slate-900">183 kg</div>
-            <div className="text-[10px] text-amber-700 font-bold">18.3% mass</div>
+            <div className="text-base font-bold text-slate-900">{formatMaterialMass('Polymer', materialFlow.contained.Polymer)}</div>
+            <div className="text-[10px] text-amber-700 font-bold">Co-processed: {formatMaterialMass('Polymer', materialFlow.coProcessed.Polymer)}</div>
             <div className="text-[10px] text-slate-500 pt-1 border-t border-slate-200 font-sans">
-              113 kg/t cement kiln co-processing
+              Canonical cement co-processing disposition
             </div>
           </div>
 
           {/* Silicon */}
           <div className="p-3 rounded-xl border border-slate-200 bg-slate-50 space-y-1">
             <span className="text-[10px] text-slate-400 block uppercase">Solar Silicon</span>
-            <div className="text-base font-bold text-slate-900">37 kg</div>
-            <div className="text-[10px] text-slate-700 font-bold">3.7% mass</div>
+            <div className="text-base font-bold text-slate-900">{formatMaterialMass('Silicon', materialFlow.contained.Silicon)}</div>
+            <div className="text-[10px] text-slate-700 font-bold">Recovered: {formatMaterialMass('Silicon', materialFlow.recovered.Silicon)}</div>
             <div className="text-[10px] text-slate-500 pt-1 border-t border-slate-200 font-sans">
-              Recovered for metallurgical silicon
+              Yield: {(materialFlow.recovered.Silicon / materialFlow.contained.Silicon * 100).toFixed(0)}% · canonical recovered material
             </div>
           </div>
 
           {/* Copper */}
           <div className="p-3 rounded-xl border border-slate-200 bg-slate-50 space-y-1">
             <span className="text-[10px] text-slate-400 block uppercase">Copper Wire</span>
-            <div className="text-base font-bold text-slate-900">6.0 kg</div>
-            <div className="text-[10px] text-amber-800 font-bold">0.60% mass</div>
+            <div className="text-base font-bold text-slate-900">{formatMaterialMass('Copper', materialFlow.contained.Copper)}</div>
+            <div className="text-[10px] text-amber-800 font-bold">Recovered: {formatMaterialMass('Copper', materialFlow.recovered.Copper)}</div>
             <div className="text-[10px] text-slate-500 pt-1 border-t border-slate-200 font-sans">
-              100% recovered via J-box strip
+              Yield: {(materialFlow.recovered.Copper / materialFlow.contained.Copper * 100).toFixed(0)}% · canonical recovered material
             </div>
           </div>
 
           {/* Silver */}
           <div className="p-3 rounded-xl border-2 border-teal-500 bg-teal-50/60 space-y-1">
             <span className="text-[10px] text-teal-800 font-bold block uppercase">Pure Silver (Ag)</span>
-            <div className="text-base font-bold text-teal-950">44.4 g</div>
-            <div className="text-[10px] text-teal-800 font-bold">74% of 60 g/t</div>
+            <div className="text-base font-bold text-teal-950">{formatMaterialMass('Silver', materialFlow.recovered.Silver)}</div>
+            <div className="text-[10px] text-teal-800 font-bold">Recovered from {formatMaterialMass('Silver', materialFlow.contained.Silver)}</div>
             <div className="text-[10px] text-teal-900 pt-1 border-t border-teal-200 font-sans">
-              Generates ₹10,656/t value @ ₹240/g
+              Yield: {(materialFlow.recovered.Silver / materialFlow.contained.Silver * 100).toFixed(0)}% · canonical recovered material
             </div>
           </div>
 
           {/* Residual */}
           <div className="p-3 rounded-xl border border-slate-200 bg-slate-50 space-y-1">
             <span className="text-[10px] text-slate-400 block uppercase">TSDF Residual</span>
-            <div className="text-base font-bold text-slate-900">~90 kg</div>
-            <div className="text-[10px] text-rose-700 font-bold">9.0% residual</div>
+            <div className="text-base font-bold text-slate-900">{materialFlow.residualMassTonnes.toFixed(2)} kg</div>
+            <div className="text-[10px] text-rose-700 font-bold">{materialFlow.residualPct.toFixed(1)}% residual</div>
             <div className="text-[10px] text-slate-500 pt-1 border-t border-slate-200 font-sans">
-              Hazardous waste safe containment
+              Canonical TSDF residual disposition
             </div>
           </div>
         </div>
@@ -713,7 +717,7 @@ export const OverviewView: React.FC<OverviewViewProps> = ({ onNavigate }) => {
               <strong className="text-white text-sm">Mandate Deep Thermal & Hydrometallurgical Recovery</strong>
             </div>
             <p className="text-slate-300 leading-relaxed">
-              Mechanical shredding yields 0% silver recovery, locking operating economics at −₹10.2k/t. Deep chemical delamination recovers 74% of silver (44.4 g/t), unlocking <strong>₹10,656/t in high-value revenue</strong> that supports TSDF compliance.
+              Mechanical shredding yields {(canonicalData.recycling_routes.Mechanical.material_recovery_yields.Silver * 100).toFixed(0)}% silver recovery. Chemical delamination recovers {(materialFlow.recovered.Silver / materialFlow.contained.Silver * 100).toFixed(0)}% of contained silver ({formatMaterialMass('Silver', materialFlow.recovered.Silver)} recovered), while route economics remain governed by the canonical reference cases.
             </p>
           </div>
 
@@ -726,7 +730,7 @@ export const OverviewView: React.FC<OverviewViewProps> = ({ onNavigate }) => {
               <strong className="text-white text-sm">Enact Statutory Solar EPR Certificate Floor</strong>
             </div>
             <p className="text-slate-300 leading-relaxed">
-              E-Waste Rules 2022 list Category CEEW14 without mandatory collection quotas or tradable certificate pricing. Gazetting an <strong>EPR credit floor of ≥₹22/kg</strong> transforms the chemical route from −₹5.9k/t to <strong>+₹16.1k/t bankable profit</strong>.
+              E-Waste Rules 2022 list Category CEEW14 without mandatory collection quotas or tradable certificate pricing. The canonical EPR Floor Bankable Case reports {formatNet(econCases.EPR_Floor_Bankable_Case.net_inr_per_tonne)} per tonne versus {formatNet(econCases.Silver_Repriced_Team_Case.net_inr_per_tonne)} for the Silver Re-Priced Team Case.
             </p>
           </div>
 

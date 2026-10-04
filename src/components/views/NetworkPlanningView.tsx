@@ -35,6 +35,13 @@ export const NetworkPlanningView: React.FC = () => {
     updateScenarioParam('plantCapacityTonnesYr', PLANT_CAPACITY_TIERS[tier].capacityTonnesYr);
   };
 
+  if (!simulationResult) {
+  return (
+    <div className="p-6 text-sm text-slate-500">
+      Loading canonical scenario data...
+    </div>
+  );
+}
   const requiredCapacityKt = simulationResult.infrastructure.requiredCapacity2040KtYr;
   const plantSizing = calculate_required_plants(requiredCapacityKt, scenarioParams.plantCapacityTonnesYr);
   const transportMetrics = calculate_transport_cost(scenarioParams.avgTransportDistanceKm, scenarioParams.reverseLogisticsFreightINR_per_tkm);

@@ -54,7 +54,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentTab, onSelectTab }) => 
   ];
 
   return (
-    <aside className="w-64 bg-[#0F172A] text-slate-300 flex flex-col justify-between shrink-0 h-screen sticky top-0 border-r border-slate-800/90 select-none z-30">
+    <aside className="hidden md:flex w-64 bg-[#0F172A] text-slate-300 flex-col justify-between shrink-0 h-screen sticky top-0 border-r border-slate-800/90 select-none z-30">
       {/* Brand & Persona Section */}
       <div className="flex-1 overflow-y-auto">
         <div className="px-5 py-4 border-b border-slate-800/80 flex items-center justify-between">
@@ -67,9 +67,6 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentTab, onSelectTab }) => 
               Decarbonization Circularity
             </div>
           </div>
-          <span className="text-[9px] font-mono text-teal-400 border border-teal-500/30 px-1.5 py-0.5 rounded bg-teal-950/40">
-            Tech Meet 13.0
-          </span>
         </div>
 
         {/* User Role Switcher */}

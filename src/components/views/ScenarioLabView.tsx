@@ -30,7 +30,13 @@ export const ScenarioLabView: React.FC = () => {
   } = useScenario();
 
   const [showAdvanced, setShowAdvanced] = useState(false);
-
+  if (!simulationResult) {
+  return (
+    <div className="p-6 text-sm text-slate-500">
+      Loading canonical scenario data…
+    </div>
+  );
+}
   const unitDivider = unit === 'Mt' ? 1000 : 1;
   const unitLabel = unit === 'Mt' ? 'Mt' : 'kt';
 

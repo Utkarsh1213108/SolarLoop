@@ -1,8 +1,10 @@
-import React, { useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import { useScenario } from '../../context/ScenarioContext';
 import { SolarAsset, AssetCategory, TechnologyType } from '../../types';
 import { DataProvenanceBadge } from '../common/DataProvenanceBadge';
 import { Plus, Search, Filter, Layers, MapPin, Calendar, CheckCircle2, ChevronRight, X } from 'lucide-react';
+import { QrCode } from 'lucide-react';
+import { AssetQrScanner } from '../common/AssetQrScanner';
 
 export const AssetIntelligenceView: React.FC = () => {
   const { assets, addAsset, selectedState } = useScenario();
@@ -10,6 +12,7 @@ export const AssetIntelligenceView: React.FC = () => {
   const [categoryFilter, setCategoryFilter] = useState<string>('all');
   const [selectedAsset, setSelectedAsset] = useState<SolarAsset | null>(assets[0] || null);
   const [isRegisterOpen, setIsRegisterOpen] = useState(false);
+  const [isScannerOpen, setIsScannerOpen] = useState(false);
 
   // Form State for new asset
   const [formData, setFormData] = useState({
@@ -63,8 +66,17 @@ export const AssetIntelligenceView: React.FC = () => {
     setIsRegisterOpen(false);
   };
 
+  const handleQrDetected = useCallback((value: string) => {
+    const asset = assets.find(item => item.id === value || item.name === value || value.includes(item.id));
+    if (asset) {
+      setSearchTerm(asset.id);
+      setSelectedAsset(asset);
+      setIsScannerOpen(false);
+    }
+  }, [assets]);
+
   return (
-    <div className="p-6 space-y-6 max-w-7xl mx-auto">
+    <div className="p-4 sm:p-6 space-y-6 max-w-7xl mx-auto">
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-slate-200">
         <div>
@@ -75,7 +87,7 @@ export const AssetIntelligenceView: React.FC = () => {
             Registry of utility, C&I, and distributed solar installations. Computes module counts, elemental bill-of-materials mass, and Weibull end-of-life windows.
           </p>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2 sm:gap-3">
           <span className="text-[11px] font-mono text-slate-700 bg-slate-100 border border-slate-300 px-2.5 py-1 rounded">
             Demo scenario · Illustrative data
           </span>
@@ -86,6 +98,15 @@ export const AssetIntelligenceView: React.FC = () => {
           >
             <Plus className="w-3.5 h-3.5" />
             <span>Register Asset</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => setIsScannerOpen(true)}
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-teal-800 bg-teal-50 hover:bg-teal-100 border border-teal-200 rounded-lg transition-colors cursor-pointer"
+          >
+            <QrCode className="w-3.5 h-3.5" />
+            <span className="hidden sm:inline">Scan QR</span>
+            <span className="sm:hidden">Scan</span>
           </button>
         </div>
       </div>
@@ -101,7 +122,7 @@ export const AssetIntelligenceView: React.FC = () => {
       </div>
 
       {/* Filter and Search Bar */}
-      <div className="flex flex-col sm:flex-row items-center justify-between gap-3 bg-white p-3 border border-slate-200 rounded-lg">
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 bg-white p-3 border border-slate-200 rounded-lg">
         <div className="flex items-center gap-2 w-full sm:w-auto">
           <div className="relative w-full sm:w-64">
             <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-2.5" />
@@ -426,6 +447,9 @@ export const AssetIntelligenceView: React.FC = () => {
             </form>
           </div>
         </div>
+      )}
+      {isScannerOpen && (
+        <AssetQrScanner onDetected={handleQrDetected} onClose={() => setIsScannerOpen(false)} />
       )}
     </div>
   );

@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Boxes, LayoutDashboard, Network, QrCode } from 'lucide-react';
 import { ScenarioProvider } from './context/ScenarioContext';
 import { Sidebar } from './components/layout/Sidebar';
 import { TopHeader } from './components/layout/TopHeader';
@@ -68,6 +69,12 @@ function MainLayout() {
     }
   };
 
+  const mobileNav = [
+    { id: 'overview', label: 'Brief', icon: LayoutDashboard },
+    { id: 'assets', label: 'Assets', icon: Boxes },
+    { id: 'network', label: 'Network', icon: Network }
+  ];
+
   return (
     <div className="flex h-screen w-full bg-[#F8FAFC] overflow-hidden text-slate-800 antialiased font-sans">
       {/* Persistent Enterprise Sidebar */}
@@ -79,10 +86,38 @@ function MainLayout() {
         <TopHeader currentTabName={tabTitles[currentTab] || 'Overview'} />
 
         {/* Scrollable Content Canvas */}
-        <main className="flex-1 overflow-y-auto pb-12">
+        <main className="flex-1 overflow-y-auto pb-24 md:pb-12">
           {renderView()}
         </main>
       </div>
+
+      <nav className="md:hidden fixed bottom-0 inset-x-0 z-40 bg-slate-950/95 border-t border-slate-800 px-2 pb-[env(safe-area-inset-bottom)]">
+        <div className="grid grid-cols-4 gap-1 max-w-lg mx-auto py-2">
+          {mobileNav.map((item) => {
+            const Icon = item.icon;
+            const isActive = currentTab === item.id;
+            return (
+              <button
+                key={item.id}
+                type="button"
+                onClick={() => setCurrentTab(item.id)}
+                className={`min-h-12 rounded-lg flex flex-col items-center justify-center gap-1 text-[10px] font-medium transition-colors ${isActive ? 'text-teal-300 bg-teal-500/15' : 'text-slate-400'}`}
+              >
+                <Icon className="w-4 h-4" />
+                <span>{item.label}</span>
+              </button>
+            );
+          })}
+          <button
+            type="button"
+            onClick={() => setCurrentTab('assets')}
+            className="min-h-12 rounded-lg flex flex-col items-center justify-center gap-1 text-[10px] font-semibold text-white bg-teal-700"
+          >
+            <QrCode className="w-4 h-4" />
+            <span>Scan QR</span>
+          </button>
+        </div>
+      </nav>
 
       {/* Global Drawers & Modals */}
       <MethodologyDrawer />

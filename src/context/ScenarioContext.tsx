@@ -51,7 +51,7 @@ interface ScenarioContextType {
   scenarioParams: ScenarioParameters;
   updateScenarioParam: <K extends keyof ScenarioParameters>(key: K, value: ScenarioParameters[K]) => void;
   resetScenarioParams: () => void;
-  simulationResult: ReturnType<typeof run_scenario>;
+  simulationResult: ReturnType<typeof run_scenario> | null;
   canonicalMaterialFlow: ReturnType<typeof calculateCanonicalMaterialFlow>;
   canonicalEconomics: ReturnType<typeof calculateCanonicalEconomics>;
   runSimulation: () => void;
@@ -128,8 +128,11 @@ export const ScenarioProvider: React.FC<{ children: React.ReactNode }> = ({ chil
 
   // Compute live analytical results mapped directly from canonical engine
   const simulationResult = useMemo(() => {
+    if (!canonicalData) {
+      return null;
+    }
     return run_scenario(scenarioParams, activeScenario);
-  }, [scenarioParams, activeScenario]);
+  }, [canonicalData, scenarioParams, activeScenario]);
 
   const canonicalMaterialFlow = useMemo<ReturnType<typeof calculateCanonicalMaterialFlow> | null>(() => {
     if (!activeCanonicalScenario) {
@@ -211,7 +214,7 @@ export const ScenarioProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     scenarioParams,
     updateScenarioParam,
     resetScenarioParams,
-    simulationResult,
+    simulationResult: simulationResult!,
     canonicalMaterialFlow: canonicalMaterialFlow!,
     canonicalEconomics: canonicalEconomics!,
     runSimulation,

@@ -15,8 +15,15 @@ import {
 export const EnvironmentalImpactView: React.FC = () => {
   const { simulationResult, unit, askIntelligence } = useScenario();
   const [showMethodology, setShowMethodology] = useState(false);
-
+  if (!simulationResult) {
+  return (
+    <div className="p-6 text-sm text-slate-500">
+      Loading canonical scenario data...
+    </div>
+  );
+}
   const impact = simulationResult.environmental;
+  
   const unitDivider = unit === 'Mt' ? 1000 : 1;
   const unitLabel = unit === 'Mt' ? 'Mt' : 'kt';
 

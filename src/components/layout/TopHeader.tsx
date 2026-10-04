@@ -24,28 +24,27 @@ export const TopHeader: React.FC<TopHeaderProps> = ({ currentTabName }) => {
   } = useScenario();
 
   return (
-    <header className="h-14 border-b border-slate-200/90 bg-white px-6 flex items-center justify-between sticky top-0 z-20 select-none shadow-xs">
+    <header className="min-h-14 border-b border-slate-200/90 bg-white px-3 sm:px-6 py-2 flex items-center justify-between gap-2 sticky top-0 z-20 select-none shadow-xs">
       {/* Zone 1: Brand & Context Indicator */}
-      <div className="flex items-center gap-3">
+      <div className="min-w-0 flex items-center gap-3">
         <div className="flex items-baseline gap-2">
           <span className="font-bold text-slate-900 text-sm tracking-tight font-sans">
             SolarLoop
           </span>
           <span className="hidden lg:inline text-slate-400 text-xs font-normal">|</span>
           <span className="hidden lg:inline text-xs text-slate-600 font-medium tracking-tight">
-            India Solar Panel Circularity Decision Engine
+          
           </span>
         </div>
         <span className="hidden xl:inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-mono text-teal-800 bg-teal-50 border border-teal-200">
           <Award className="w-3 h-3 text-teal-700" />
-          <span>Inter IIT Tech Meet 13.0</span>
         </span>
       </div>
 
       {/* Zone 2: Decision Controls (Scenario, Horizon, Geography, Units) */}
-      <div className="flex items-center gap-2.5">
+      <div className="flex items-center justify-end gap-1.5 sm:gap-2.5 min-w-0">
         {/* Scenario Selector Dropdown */}
-        <div className="flex items-center gap-1.5 bg-slate-50 border border-slate-200 rounded-lg px-2.5 py-1 text-xs">
+        <div className="hidden sm:flex items-center gap-1.5 bg-slate-50 border border-slate-200 rounded-lg px-2.5 py-1 text-xs">
           <span className="text-[10px] font-mono uppercase tracking-wider text-slate-400 font-semibold hidden sm:inline">
             Scenario:
           </span>
@@ -63,7 +62,7 @@ export const TopHeader: React.FC<TopHeaderProps> = ({ currentTabName }) => {
         </div>
 
         {/* Horizon Year Selector (2030, 2040, 2050) */}
-        <div className="inline-flex rounded-lg border border-slate-200 p-0.5 bg-slate-50 text-[11px] font-mono">
+        <div className="hidden sm:inline-flex rounded-lg border border-slate-200 p-0.5 bg-slate-50 text-[11px] font-mono">
           {(['2030', '2040', '2050'] as const).map((h) => (
             <button
               key={h}
